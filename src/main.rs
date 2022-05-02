@@ -1,16 +1,22 @@
-use web::Application;
+use web::{Application, Request, Response};
 fn main() {
-    // TODO: move logger to lib.rs
-    env_logger::init();
     let mut app = Application::new("0:1234");
     app.route("/", index);
-    app.route("/hello", hello);
     app.run();
 }
 
-fn index() -> String {
-    "hello web.rs".to_string()
+fn index(req: Request) -> Response {
+    println!("{:?}", req);
+    Response::from("hello web.rs")
 }
-fn hello() -> String {
-    "hello world".to_string()
+
+fn hello(req: Request, name: String) -> Response {
+    Response::from(&format!("hello {}", name))
+}
+
+struct Hello {}
+impl Hello {
+    fn get(&self, req: Request, name: String) -> Response {
+        todo!()
+    }
 }

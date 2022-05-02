@@ -20,10 +20,12 @@ fn index() -> String {
 ```
 ## Roadmap
 
-- [ ] Get & Post & HTTP methods
-- [ ] JSON output
+- [x] query & headers
+- [ ] URL route with regexp
+- [ ] Post
+    - [ ] Forms
+- [ ] Response & JSON output
 - [ ] Templating
-- [ ] Forms
 - [ ] Tests
 - [ ] Static files
 - [ ] Redirect

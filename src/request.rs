@@ -17,6 +17,7 @@ pub struct Request {
     pub headers: HashMap<String, String>,
     pub get: HashMap<String, String>,
     pub post: HashMap<String, String>,
+    pub params: HashMap<String, String>,
 }
 
 impl Request {
@@ -54,6 +55,7 @@ impl Request {
             headers,
             get,
             post,
+            params: HashMap::new(),
         }
     }
 }

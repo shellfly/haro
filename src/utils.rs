@@ -14,7 +14,7 @@ pub fn parse_headers(reader: &mut BufReader<TcpStream>) -> HashMap<String, Strin
         if buf == "\r\n" {
             break;
         }
-        let header: Vec<&str> = buf.split(":").collect();
+        let header: Vec<&str> = buf.trim().splitn(2, ":").collect();
         if header.len() != 2 {
             warn!("failed to parse header: {:?}", header);
         }

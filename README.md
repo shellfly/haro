@@ -7,24 +7,37 @@ Visit http://webrs.org/ for more information.
 ## Example
 
 ```Rust
-use web::Application;
+use web::{Application, Request, Response};
 fn main() {
     let mut app = Application::new("0:1234");
     app.route("/", index);
+    app.route("/hello/:name", hello);
     app.run();
 }
 
-fn index() -> String {
-    "hello web.rs".to_string()
+fn index(_req: Request) -> Response {
+    Response::str("Hello web.rs")
 }
+
+fn hello(req: Request) -> Response {
+    Response::json(req.params)
+}
+```
+
+``` bash
+➜ curl localhost:1234
+Hello web.rs
+➜ curl localhost:1234/hello/world
+{"name":"world"}
 ```
 ## Roadmap
 
 - [x] query & headers
-- [ ] URL route with regexp
+- [x] URL route
 - [ ] Post
     - [ ] Forms
-- [ ] Response & JSON output
+- [x] Response & JSON output
+- [ ] Catch panic
 - [ ] Templating
 - [ ] Tests
 - [ ] Static files

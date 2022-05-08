@@ -1,6 +1,6 @@
 use std::{
     collections::HashMap,
-    io::{BufRead, BufReader, Write},
+    io::{BufRead, BufReader},
     net::TcpStream,
 };
 
@@ -25,7 +25,7 @@ impl Request {
         let mut reader = BufReader::new(stream.try_clone().unwrap());
         let mut buf = String::new();
         reader.read_line(&mut buf).unwrap();
-        let line: Vec<&str> = buf.trim().split(" ").collect();
+        let line: Vec<&str> = buf.trim().split(' ').collect();
         let (method, full_path, version) = (
             line[0].to_string(),
             line[1].to_string(),
@@ -37,7 +37,7 @@ impl Request {
         let mut get = HashMap::new();
         let mut post = HashMap::new();
 
-        let path = if let Some(query_start) = full_path.find("?") {
+        let path = if let Some(query_start) = full_path.find('?') {
             get = parse_query(&full_path[query_start + 1..]);
             full_path[..query_start].to_string()
         } else {

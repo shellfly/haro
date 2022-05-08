@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 use serde_json;
 
@@ -32,9 +32,12 @@ impl Response {
             content_type: "application/json".to_string(),
         }
     }
+}
 
-    pub fn to_string(&self) -> String {
-        format!(
+impl Display for Response {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
             "HTTP/1.1 {} {}\r\nContent-Length: {}\r\nContent-Type: {}\r\n\r\n{}",
             self.status_code, self.status, self.content_length, self.content_type, self.content,
         )

@@ -51,12 +51,12 @@ impl Rule {
     fn from(pattern: &'static str) -> Self {
         let mut parts = Vec::new();
         let mut has_regex = false;
-        for part in pattern.split("/") {
-            if part.starts_with(":") {
-                let part = format!("(?P<{}>.+)", &part[1..]);
-                parts.push(part);
+        for part in pattern.split('/') {
+            if let Some(stripped) = part.strip_prefix(':') {
+                let regex_part = format!("(?P<{}>.+)", stripped);
+                parts.push(regex_part);
                 has_regex = true
-            } else if part.len() > 0 {
+            } else if !part.is_empty() {
                 parts.push(part.to_string())
             }
         }
@@ -134,7 +134,7 @@ impl Application {
         req.params = params;
         let res = handler(req);
 
-        stream.write(res.to_string().as_bytes()).unwrap();
+        stream.write_all(res.to_string().as_bytes()).unwrap();
         stream.flush().unwrap();
     }
 }

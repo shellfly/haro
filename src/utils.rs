@@ -14,7 +14,7 @@ pub fn parse_headers(reader: &mut BufReader<TcpStream>) -> HashMap<String, Strin
         if buf == "\r\n" {
             break;
         }
-        let header: Vec<&str> = buf.trim().splitn(2, ":").collect();
+        let header: Vec<&str> = buf.trim().splitn(2, ':').collect();
         if header.len() != 2 {
             warn!("failed to parse header: {:?}", header);
         }
@@ -25,8 +25,8 @@ pub fn parse_headers(reader: &mut BufReader<TcpStream>) -> HashMap<String, Strin
 
 pub fn parse_query(query: &str) -> HashMap<String, String> {
     let mut get = HashMap::new();
-    for q in query.split("&") {
-        let qs: Vec<&str> = q.split("=").collect();
+    for q in query.split('&') {
+        let qs: Vec<&str> = q.split('=').collect();
         if qs.len() != 2 {
             warn!("failed to parse query string: {:?}", qs);
             continue;

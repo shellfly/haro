@@ -1,6 +1,12 @@
-use std::{collections::HashMap, fmt::Display};
+use std::{
+    collections::HashMap,
+    fmt::Display,
+    fs,
+    path::{self, Path},
+};
 
 use serde_json;
+use tinytemplate::TinyTemplate;
 
 #[derive(Debug)]
 pub struct Response {
@@ -30,6 +36,24 @@ impl Response {
             content_length: s.len(),
             content: s,
             content_type: "application/json".to_string(),
+        }
+    }
+
+    pub fn tmpl<T: AsRef<str>>(name: T, context: HashMap<String, String>) -> Self {
+        // TODO(optimize): preload template
+        let name = name.as_ref();
+        let dir = env!("CARGO_MANIFEST_DIR");
+        let file_path = Path::new(dir).join("src").join(name);
+        let mut tt = TinyTemplate::new();
+        let text = fs::read_to_string(file_path).unwrap();
+        tt.add_template(name, &text).unwrap();
+        let s = tt.render(name, &context).unwrap();
+        Self {
+            status_code: 200,
+            status: "OK".to_string(),
+            content_length: s.len(),
+            content: s,
+            content_type: "text/plain".to_string(),
         }
     }
 }

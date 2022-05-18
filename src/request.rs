@@ -1,11 +1,8 @@
-use std::{
-    collections::HashMap,
-    io::{BufRead, BufReader},
-    net::TcpStream,
-};
+use std::collections::HashMap;
 
 use log::{debug, error, info};
 
+use crate::conn::Conn;
 use crate::utils::{parse_body, parse_headers, parse_query};
 
 #[derive(Debug)]
@@ -21,17 +18,16 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn from(stream: &TcpStream) -> Self {
-        let mut reader = BufReader::new(stream.try_clone().unwrap());
+    pub async fn from(conn: &mut Conn) -> Self {
         let mut buf = String::new();
-        reader.read_line(&mut buf).unwrap();
+        conn.read_line(&mut buf).await;
         let line: Vec<&str> = buf.trim().split(' ').collect();
         let (method, full_path, version) = (
             line[0].to_string(),
             line[1].to_string(),
             line[2].to_string(),
         );
-        let headers = parse_headers(&mut reader);
+        let headers = parse_headers(conn).await;
         debug!("{method} {full_path} {version}, headers: {:?}", headers);
 
         let mut get = HashMap::new();
@@ -44,7 +40,7 @@ impl Request {
             full_path.clone()
         };
         if method == "POST" {
-            post = parse_body(&mut reader)
+            post = parse_body(conn)
         }
 
         Self {

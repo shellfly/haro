@@ -1,7 +1,8 @@
-pub mod app;
-pub mod request;
-pub mod response;
-pub mod utils;
+mod app;
+mod conn;
+mod request;
+mod response;
+mod utils;
 
 pub use app::Application;
 pub use request::Request;

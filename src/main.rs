@@ -1,7 +1,7 @@
 use web::{Application, Request, Response};
 
 fn main() {
-    let mut app = Application::new("0:8000");
+    let mut app = Application::new("0:8080");
     app.route("/", index);
     app.route("/hello/:name", hello);
     app.route("/template/:name", template);

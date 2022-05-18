@@ -1,16 +1,14 @@
-use std::{
-    collections::HashMap,
-    io::{BufRead, BufReader},
-    net::TcpStream,
-};
+use std::collections::HashMap;
 
 use log::warn;
 
-pub fn parse_headers(reader: &mut BufReader<TcpStream>) -> HashMap<String, String> {
+use crate::conn::Conn;
+
+pub async fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
     let mut headers = HashMap::new();
     loop {
         let mut buf = String::new();
-        reader.read_line(&mut buf).unwrap();
+        conn.read_line(&mut buf).await;
         if buf == "\r\n" {
             break;
         }
@@ -35,6 +33,6 @@ pub fn parse_query(query: &str) -> HashMap<String, String> {
     }
     get
 }
-pub fn parse_body(reader: &mut BufReader<TcpStream>) -> HashMap<String, String> {
+pub fn parse_body(conn: &mut Conn) -> HashMap<String, String> {
     HashMap::new()
 }

@@ -1,18 +1,20 @@
 use std::{
     collections::HashMap,
-    fmt::Debug,
-    io::Write,
-    net::{TcpListener, TcpStream},
+    fmt::{Debug, Display},
 };
 
 use log::{debug, error, info};
 use regex::Regex;
+use tokio::net::TcpListener;
 
+use crate::conn::Conn;
 use crate::request::Request;
 use crate::response::Response;
+//use crate::utils::get_function_name;
 
 type Handler = fn(Request) -> Response;
 
+#[derive(Clone)]
 struct Router {
     routes: Vec<(Rule, Handler)>,
 }
@@ -31,7 +33,7 @@ impl Router {
         self.routes
             .sort_by(|a, b| b.0.num_parts.cmp(&a.0.num_parts));
     }
-    fn route(&self, path: &str) -> (HashMap<String, String>, Handler) {
+    fn dispatch(&self, path: &str) -> (HashMap<String, String>, Handler) {
         for (rule, handler) in &self.routes {
             if let Some(params) = rule._match(path) {
                 return (params, *handler);
@@ -40,7 +42,15 @@ impl Router {
         (HashMap::new(), notfound)
     }
 }
-#[derive(Debug)]
+
+impl Display for Router {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let v: Vec<String> = self.routes.iter().map(|r| r.0.to_string()).collect();
+        write!(f, "{}", v.join("\n"))
+    }
+}
+
+#[derive(Debug, Clone)]
 struct Rule {
     pattern: &'static str,
     num_parts: usize,
@@ -100,6 +110,11 @@ impl Rule {
         None
     }
 }
+impl Display for Rule {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.pattern)
+    }
+}
 
 pub struct Application {
     addr: &'static str,
@@ -117,26 +132,38 @@ impl Application {
     }
 
     pub fn run(&self) {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(self.run_async())
+    }
+
+    async fn run_async(&self) {
         let listener = TcpListener::bind(self.addr)
+            .await
             .unwrap_or_else(|error| panic!("Problem starting web server: {:?}", error));
         info!("Started web server on addr {}", self.addr);
-        debug!("routes: \n {:?}", self.router.routes);
-        for stream in listener.incoming() {
-            let stream = stream.unwrap();
-            self.handle_connection(stream);
+        debug!("routes: \n {:}", self.router);
+        loop {
+            let (stream, _) = listener.accept().await.unwrap();
+            // TODO: anyway to avoid clone?
+            // tokio::spawn needs static lifetime, so we can't access self in spawn
+            let router = self.router.clone();
+            tokio::spawn(async move {
+                let mut conn = Conn::new(stream);
+                handle_connection(router, &mut conn).await;
+            });
         }
     }
+}
 
-    fn handle_connection(&self, mut stream: TcpStream) {
-        let mut req = Request::from(&stream);
-        info!("{} {}", req.method, req.full_path);
-        let (params, handler) = self.router.route(&req.path);
-        req.params = params;
-        let res = handler(req);
+async fn handle_connection(router: Router, conn: &mut Conn) {
+    let mut req = Request::from(conn).await;
+    info!("{} {}", req.method, req.full_path);
+    let (params, handler) = router.dispatch(&req.path);
+    req.params = params;
+    let res = handler(req);
 
-        stream.write_all(res.to_string().as_bytes()).unwrap();
-        stream.flush().unwrap();
-    }
+    conn.write_all(res.to_string().as_bytes()).await;
+    conn.flush().await;
 }
 
 fn notfound(_req: Request) -> Response {

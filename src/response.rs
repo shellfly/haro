@@ -1,11 +1,5 @@
-use std::{
-    collections::HashMap,
-    fmt::Display,
-    fs,
-    path::{self, Path},
-};
+use std::{collections::HashMap, fmt::Display, fs, path::Path};
 
-use serde_json;
 use tinytemplate::TinyTemplate;
 
 #[derive(Debug)]

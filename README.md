@@ -31,14 +31,17 @@ Hello web.rs
 ➜ curl localhost:8000/hello/world
 {"name":"world"}
 ```
-## Roadmap
+## Road map
 
 - [x] query & headers
 - [x] URL route
-- [ ] Templating
+- [x] Template
 - [ ] Post
     - [ ] Forms
+    - [ ] JSON
 - [x] Response & JSON output
+- [ ] hyper request & response
+- [ ] Thread pool
 - [ ] Catch panic
 - [ ] Tests
     - [ ] self tests
@@ -51,3 +54,4 @@ Hello web.rs
 - [ ] HTTP2
 - [ ] Database
 - [ ] Deployment
+

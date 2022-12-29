@@ -18,16 +18,16 @@ pub struct Request {
 }
 
 impl Request {
-    pub async fn from(conn: &mut Conn) -> Self {
+    pub fn new(conn: &mut Conn) -> Self {
         let mut buf = String::new();
-        conn.read_line(&mut buf).await;
+        conn.read_line(&mut buf);
         let line: Vec<&str> = buf.trim().split(' ').collect();
         let (method, full_path, version) = (
             line[0].to_string(),
             line[1].to_string(),
             line[2].to_string(),
         );
-        let headers = parse_headers(conn).await;
+        let headers = parse_headers(conn);
         debug!("{method} {full_path} {version}, headers: {:?}", headers);
 
         let mut get = HashMap::new();

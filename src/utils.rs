@@ -4,11 +4,11 @@ use log::warn;
 
 use crate::conn::Conn;
 
-pub async fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
+pub fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
     let mut headers = HashMap::new();
     loop {
         let mut buf = String::new();
-        conn.read_line(&mut buf).await;
+        conn.read_line(&mut buf);
         if buf == "\r\n" {
             break;
         }

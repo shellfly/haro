@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use web::{Application, Request, Response};
 
 fn main() {
@@ -8,7 +10,7 @@ fn main() {
     app.run();
 }
 
-fn index(_req: Request) -> Response {
+fn index(_: Request) -> Response {
     Response::str("Hello web.rs")
 }
 

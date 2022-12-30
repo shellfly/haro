@@ -2,9 +2,16 @@
 
 web.rs is a web framework for Rust that is as simple as it is powerful.
 
-Visit http://webrs.org/ for more information.
+Visit https://webrs.org/ for more information.
 
 ## Example
+
+Add `web` as a dependency by cargo
+```bash
+cargo add web
+```
+
+Then, on your main.rs:
 
 ```Rust
 use web::{Application, Request, Response};
@@ -16,7 +23,7 @@ fn main() {
     app.run();
 }
 
-fn index(_req: Request) -> Response {
+fn index(_: Request) -> Response {
     Response::str("Hello web.rs")
 }
 

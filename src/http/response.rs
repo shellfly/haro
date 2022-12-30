@@ -53,7 +53,7 @@ impl Response {
         let body = s.as_bytes().to_vec();
         let res = HttpResponse::builder()
             .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "application/json")
+            .header(CONTENT_TYPE, "text/html")
             .header(CONTENT_LENGTH, body.len())
             .body(body)
             .unwrap();
@@ -64,11 +64,12 @@ impl Response {
 
 impl Display for Response {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        // write version and status
         let version = self.res.version();
         let status = self.res.status();
-        let reason = status.canonical_reason().unwrap_or("OK");
-        write!(f, "{:?} {} {}\r\n", version, status, reason).unwrap();
+        write!(f, "{version:?} {status}\r\n").unwrap();
 
+        // write headers
         for (key, val) in self.res.headers() {
             let val = std::str::from_utf8(val.as_bytes()).unwrap();
             write!(f, "{key}: {val}\r\n").unwrap();

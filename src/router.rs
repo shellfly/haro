@@ -3,8 +3,8 @@ use std::fmt::Display;
 
 use regex::Regex;
 
-use crate::request::Request;
-use crate::response::Response;
+use crate::http::request::Request;
+use crate::http::response::Response;
 
 pub type Handler = fn(Request) -> Response;
 
@@ -14,9 +14,9 @@ pub struct Router {
 }
 
 impl Router {
-    pub fn add(&mut self, pattern: &'static str, f: Handler) {
+    pub fn add(&mut self, pattern: &'static str, handler: Handler) {
         let rule = Rule::from(pattern);
-        self.routes.push((rule, f));
+        self.routes.push((rule, handler));
         self.update_order()
     }
 

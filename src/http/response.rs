@@ -1,5 +1,6 @@
 use std::{collections::HashMap, fmt::Display, fs, path::Path};
 
+use serde::Serialize;
 use tinytemplate::TinyTemplate;
 
 #[derive(Debug)]
@@ -22,7 +23,10 @@ impl Response {
         }
     }
 
-    pub fn json(s: HashMap<String, String>) -> Self {
+    pub fn json<S>(s: S) -> Self
+    where
+        S: Serialize,
+    {
         let s = serde_json::to_string(&s).unwrap();
         Self {
             status_code: 200,

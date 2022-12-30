@@ -1,11 +1,7 @@
 mod app;
-mod conn;
-mod request;
-mod response;
+mod http;
 mod router;
-mod utils;
 
+pub use crate::http::request::Request;
+pub use crate::http::response::Response;
 pub use app::Application;
-pub use request::Request;
-pub use response::Response;
-pub use router::{Handler, Router};

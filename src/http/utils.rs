@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use log::warn;
 
-use crate::conn::Conn;
+use crate::http::conn::Conn;
 
 pub fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
     let mut headers = HashMap::new();
@@ -21,15 +21,17 @@ pub fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
     headers
 }
 
-pub fn parse_query(query: &str) -> HashMap<String, String> {
+pub fn parse_query(query: Option<&str>) -> HashMap<String, String> {
     let mut get = HashMap::new();
-    for q in query.split('&') {
-        let qs: Vec<&str> = q.split('=').collect();
-        if qs.len() != 2 {
-            warn!("failed to parse query string: {:?}", qs);
-            continue;
+    if let Some(query) = query {
+        for q in query.split('&') {
+            let qs: Vec<&str> = q.split('=').collect();
+            if qs.len() != 2 {
+                warn!("failed to parse query string: {:?}", qs);
+                continue;
+            }
+            get.insert(qs[0].to_string(), qs[1].to_string());
         }
-        get.insert(qs[0].to_string(), qs[1].to_string());
     }
     get
 }

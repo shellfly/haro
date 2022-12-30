@@ -50,7 +50,6 @@ Hello web.rs
 - [ ] Redirect
 - [ ] Middleware
 - [ ] Session and Cookie
-- [ ] Multithread
 - [ ] HTTP2
 - [ ] Database
 - [ ] Deployment

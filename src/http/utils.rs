@@ -1,10 +1,11 @@
 use std::collections::HashMap;
 
-use log::warn;
+use log::{debug, info, warn};
 
 use crate::http::conn::Conn;
 
-pub fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
+pub fn read_headers(conn: &mut Conn) -> HashMap<String, String> {
+    //TODO: limit headers
     let mut headers = HashMap::new();
     loop {
         let mut buf = String::new();
@@ -12,7 +13,7 @@ pub fn parse_headers(conn: &mut Conn) -> HashMap<String, String> {
         if buf == "\r\n" {
             break;
         }
-        let header: Vec<&str> = buf.trim().splitn(2, ':').collect();
+        let header: Vec<&str> = buf.splitn(2, ':').collect();
         if header.len() != 2 {
             warn!("failed to parse header: {:?}", header);
         }
@@ -35,6 +36,7 @@ pub fn parse_query(query: Option<&str>) -> HashMap<String, String> {
     }
     get
 }
-pub fn parse_body(conn: &mut Conn) -> HashMap<String, String> {
-    HashMap::new()
+
+pub fn parse_json_body(body: &[u8]) -> HashMap<String, String> {
+    serde_json::from_slice(body).unwrap()
 }

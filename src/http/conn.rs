@@ -1,5 +1,5 @@
 use std::{
-    io::{BufRead, BufReader, BufWriter, Write},
+    io::{BufRead, BufReader, BufWriter, Read, Write},
     net::TcpStream,
 };
 
@@ -18,6 +18,9 @@ impl Conn {
 
     pub fn read_line(&mut self, buf: &mut String) {
         self.reader.read_line(buf).unwrap();
+    }
+    pub fn read_exact(&mut self, buf: &mut Vec<u8>) {
+        self.reader.read_exact(buf).unwrap();
     }
     pub fn write_all(&mut self, buf: &[u8]) {
         self.writer.write_all(buf).unwrap();

@@ -39,9 +39,10 @@ impl Application {
 fn handle_connection(router: Router, stream: TcpStream) {
     let mut conn = Conn::new(stream);
     let mut req = Request::new(&mut conn);
-    info!("{} {}", req.method, req.full_path());
+    info!("{} {}", req.method(), req.full_path());
     let (params, handler) = router.dispatch(req.path());
     req.params = params;
+
     let res = handler(req);
 
     conn.write_all(res.to_string().as_bytes());

@@ -38,7 +38,7 @@ Hello web.rs
 - [x] Template
 - [ ] Post
     - [ ] Forms
-    - [ ] JSON
+    - [x] JSON
 - [x] Response & JSON output
 - [ ] hyper request & response
 - [ ] Thread pool

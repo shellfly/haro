@@ -1,26 +1,27 @@
 use std::{collections::HashMap, fmt::Display, fs, path::Path};
 
+use http::{
+    header::{CONTENT_LENGTH, CONTENT_TYPE},
+    Response as HttpResponse, StatusCode,
+};
 use serde::Serialize;
 use tinytemplate::TinyTemplate;
 
 #[derive(Debug)]
 pub struct Response {
-    pub status_code: u8, //TODO: enum
-    pub status: String,
-    pub content: String,
-    pub content_type: String,
-    pub content_length: usize,
+    res: HttpResponse<Vec<u8>>,
 }
 
 impl Response {
     pub fn str<T: AsRef<str>>(s: T) -> Self {
-        Self {
-            status_code: 200,
-            status: "OK".to_string(),
-            content: s.as_ref().to_string(),
-            content_type: "text/plain".to_string(),
-            content_length: s.as_ref().len(),
-        }
+        let body = s.as_ref().as_bytes().to_vec();
+        let res = HttpResponse::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "text/plain")
+            .header(CONTENT_LENGTH, body.len())
+            .body(body)
+            .unwrap();
+        Self { res }
     }
 
     pub fn json<S>(s: S) -> Self
@@ -28,13 +29,15 @@ impl Response {
         S: Serialize,
     {
         let s = serde_json::to_string(&s).unwrap();
-        Self {
-            status_code: 200,
-            status: "OK".to_string(),
-            content_length: s.len(),
-            content: s,
-            content_type: "application/json".to_string(),
-        }
+        let body = s.as_bytes().to_vec();
+        let res = HttpResponse::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "application/json")
+            .header(CONTENT_LENGTH, body.len())
+            .body(body)
+            .unwrap();
+
+        Self { res }
     }
 
     pub fn tmpl<T: AsRef<str>>(name: T, context: HashMap<String, String>) -> Self {
@@ -46,22 +49,32 @@ impl Response {
         let text = fs::read_to_string(file_path).unwrap();
         tt.add_template(name, &text).unwrap();
         let s = tt.render(name, &context).unwrap();
-        Self {
-            status_code: 200,
-            status: "OK".to_string(),
-            content_length: s.len(),
-            content: s,
-            content_type: "text/plain".to_string(),
-        }
+
+        let body = s.as_bytes().to_vec();
+        let res = HttpResponse::builder()
+            .status(StatusCode::OK)
+            .header(CONTENT_TYPE, "application/json")
+            .header(CONTENT_LENGTH, body.len())
+            .body(body)
+            .unwrap();
+
+        Self { res }
     }
 }
 
 impl Display for Response {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "HTTP/1.1 {} {}\r\nContent-Length: {}\r\nContent-Type: {}\r\n\r\n{}",
-            self.status_code, self.status, self.content_length, self.content_type, self.content,
-        )
+        let version = self.res.version();
+        let status = self.res.status();
+        let reason = status.canonical_reason().unwrap_or("OK");
+        write!(f, "{:?} {} {}\r\n", version, status, reason).unwrap();
+
+        for (key, val) in self.res.headers() {
+            let val = std::str::from_utf8(val.as_bytes()).unwrap();
+            write!(f, "{key}: {val}\r\n").unwrap();
+        }
+
+        // write body
+        write!(f, "\r\n{}", std::str::from_utf8(self.res.body()).unwrap())
     }
 }

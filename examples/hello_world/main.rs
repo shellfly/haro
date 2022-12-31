@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use web::{Application, Request, Response};
 
 fn main() {

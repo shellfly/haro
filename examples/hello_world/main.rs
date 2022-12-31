@@ -13,7 +13,7 @@ fn index(_: Request) -> Response {
 }
 
 fn hello(req: Request) -> Response {
-    Response::json(req.data)
+    Response::json(req.params)
 }
 
 fn template(req: Request) -> Response {

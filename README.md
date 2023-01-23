@@ -82,12 +82,12 @@ content-type: application/json
     - [ ] Forms
     - [x] JSON
 - [x] Response & JSON output
-- [ ] Thread pool
-- [ ] Catch panic
+- [x] Thread pool
 - [ ] Tests
     - [ ] self tests
     - [ ] app tests
 - [ ] Static files
+- [ ] HTTP2
 - [ ] Redirect
 - [ ] Middleware
 - [ ] Session and Cookie

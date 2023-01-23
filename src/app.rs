@@ -5,6 +5,7 @@ use log::{debug, info};
 
 use crate::http::conn::Conn;
 use crate::http::request::Request;
+use crate::pool::ThreadPool;
 use crate::router::{Handler, Router};
 
 pub struct Application {
@@ -26,12 +27,17 @@ impl Application {
     pub fn run(&self) {
         info!("Started web server on addr {}", self.addr);
         debug!("routes: \n {:}", self.router);
+        let size = thread::available_parallelism().unwrap().get();
+        let pool = ThreadPool::new(size);
+
         let listener = TcpListener::bind(self.addr).unwrap();
         for stream in listener.incoming() {
             let stream = stream.unwrap();
             // TODO: anyway to avoid clone?
             let router = self.router.clone();
-            thread::spawn(|| handle_connection(router, stream));
+            pool.execute(|| {
+                handle_connection(router, stream);
+            });
         }
     }
 }

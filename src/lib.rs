@@ -1,5 +1,6 @@
 mod app;
 mod http;
+mod pool;
 mod router;
 
 pub use crate::http::request::Request;

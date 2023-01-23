@@ -23,7 +23,7 @@ pub fn read_headers(conn: &mut Conn) -> HashMap<String, String> {
 }
 
 pub fn parse_query(query: Option<&str>) -> HashMap<String, String> {
-    let mut get = HashMap::new();
+    let mut args = HashMap::new();
     if let Some(query) = query {
         for q in query.split('&') {
             let qs: Vec<&str> = q.split('=').collect();
@@ -31,10 +31,10 @@ pub fn parse_query(query: Option<&str>) -> HashMap<String, String> {
                 warn!("failed to parse query string: {:?}", qs);
                 continue;
             }
-            get.insert(qs[0].to_string(), qs[1].to_string());
+            args.insert(qs[0].to_string(), qs[1].to_string());
         }
     }
-    get
+    args
 }
 
 pub fn parse_json_body(body: &[u8]) -> HashMap<String, String> {

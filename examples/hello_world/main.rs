@@ -1,3 +1,4 @@
+use serde_json::json;
 use web::{Application, Request, Response};
 
 fn main() {
@@ -13,7 +14,13 @@ fn index(_: Request) -> Response {
 }
 
 fn hello(req: Request) -> Response {
-    Response::json(req.params)
+    let data = json!({
+        "method":req.method(),
+        "args":req.args,
+        "params":req.params,
+        "data":req.data,
+    });
+    Response::json(data)
 }
 
 fn template(req: Request) -> Response {

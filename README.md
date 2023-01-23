@@ -4,6 +4,13 @@ web.rs is a web framework for Rust that is as simple as it is powerful.
 
 Visit https://webrs.org/ for more information.
 
+## Motivation
+> In short, async Rust is more difficult to use and can result in a higher maintenance burden than synchronous Rust, but gives you best-in-class performance in return. All areas of async Rust are constantly improving, so the impact of these issues will wear off over time
+>
+> https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html
+
+As the async book says, while bringing performance, async Rust can result in a higher maintenance burden. The goal of this project is to create a simple and minimum synchronous Web framework for Rust.
+
 ## Example
 
 Add `web` as a dependency by cargo
@@ -28,15 +35,43 @@ fn index(_: Request) -> Response {
 }
 
 fn hello(req: Request) -> Response {
-    Response::json(req.params)
+    let data = json!({
+        "method":req.method(),
+        "args":req.args,
+        "params":req.params,
+        "data":req.data,
+    });
+    Response::json(data)
 }
 ```
 
-``` bash
-➜ curl localhost:8000
+```bash
+http get "localhost:8080/"
+HTTP/1.1 200 OK
+content-length: 12
+content-type: text/plain
+
 Hello web.rs
-➜ curl localhost:8000/hello/world
-{"name":"world"}
+```
+
+```bash
+http post "localhost:8080/hello/world?a=b" c=d
+HTTP/1.1 200 OK
+content-length: 77
+content-type: application/json
+
+{
+    "args": {
+        "a": "b"
+    },
+    "data": {
+        "c": "d"
+    },
+    "method": "POST",
+    "params": {
+        "name": "world"
+    }
+}
 ```
 ## Road map
 
@@ -47,7 +82,6 @@ Hello web.rs
     - [ ] Forms
     - [x] JSON
 - [x] Response & JSON output
-- [ ] hyper request & response
 - [ ] Thread pool
 - [ ] Catch panic
 - [ ] Tests
@@ -57,7 +91,6 @@ Hello web.rs
 - [ ] Redirect
 - [ ] Middleware
 - [ ] Session and Cookie
-- [ ] HTTP2
 - [ ] Database
 - [ ] Deployment
 

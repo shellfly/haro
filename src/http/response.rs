@@ -26,6 +26,10 @@ impl Response {
         Self { res }
     }
 
+    pub fn body(&self) -> &[u8] {
+        self.res.body()
+    }
+
     pub fn header<K, V>(self, key: K, value: V) -> Self
     where
         HeaderName: TryFrom<K>,

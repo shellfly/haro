@@ -84,12 +84,6 @@ impl From<&'static str> for Rule {
 }
 
 impl Rule {
-    /// Register a rule for routing incoming requests and building URLs.
-    ///
-    /// ```
-    /// assert!(Rule.from("/")._match("/").is_none())
-    /// Rule.from("/abc")._match("/def")
-    /// ```
     fn _match(&self, path: &str) -> Option<HashMap<String, String>> {
         if self.regex.is_none() {
             if self.pattern == path {

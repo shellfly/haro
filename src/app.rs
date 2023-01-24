@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::net::TcpStream;
 use std::sync::Arc;
 use std::{net::TcpListener, thread};
@@ -8,7 +9,7 @@ use crate::http::conn::Conn;
 use crate::middleware::{make_dyn_handler, Middleware};
 use crate::pool::ThreadPool;
 use crate::router::{Handler, Router};
-use crate::Request;
+use crate::{Request, Response};
 
 pub struct Application {
     addr: &'static str,
@@ -17,6 +18,17 @@ pub struct Application {
 }
 
 impl Application {
+    /// ```
+    /// use std::collections::HashMap;
+    /// use web::{Application, Request, Response};
+    /// fn test_handler(_:Request) -> Response {
+    ///     Response::str("test")
+    /// }
+    /// let mut app = Application::new("0:12345");
+    /// app.route("/", test_handler);
+    /// let res = app.request("get", "/", HashMap::new(), &Vec::new());
+    /// assert_eq!("test".as_bytes(), res.body());
+    /// ```
     pub fn new(addr: &'static str) -> Self {
         env_logger::init();
         let router = Router::default();
@@ -34,6 +46,25 @@ impl Application {
 
     pub fn route(&mut self, pattern: &'static str, handler: Handler) {
         self.router.add(pattern, handler);
+    }
+
+    pub fn request(
+        &self,
+        method: &str,
+        uri: &str,
+        headers: HashMap<String, String>,
+        body: &[u8],
+    ) -> Response {
+        let mut req = Request::new(method, uri, headers, body);
+        let (params, handler) = self.router.dispatch(req.path());
+        req.params = params;
+
+        let mut dyn_handler = make_dyn_handler(handler);
+        // apply middleware in reverse order
+        for middleware in self.middlewares.iter().rev() {
+            dyn_handler = middleware(dyn_handler);
+        }
+        dyn_handler(req)
     }
 
     pub fn run(&self) {
@@ -57,7 +88,7 @@ impl Application {
 
 fn handle_connection(router: Router, middlewares: Vec<Arc<Middleware>>, stream: TcpStream) {
     let mut conn = Conn::new(stream);
-    let mut req = Request::new(&mut conn);
+    let mut req = Request::from(&mut conn);
     let (params, handler) = router.dispatch(req.path());
     req.params = params;
 

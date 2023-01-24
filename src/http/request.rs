@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use cookie::Cookie;
 use http::{
     header::{CONTENT_LENGTH, CONTENT_TYPE, COOKIE},
-    HeaderMap, HeaderValue, Method, Request as HttpRequest, Version,
+    HeaderMap, HeaderValue, Request as HttpRequest, Version,
 };
 use log::warn;
 
@@ -21,7 +21,41 @@ pub struct Request {
 }
 
 impl Request {
-    pub fn new(conn: &mut Conn) -> Self {
+    pub fn new(method: &str, uri: &str, headers: HashMap<String, String>, body: &[u8]) -> Self {
+        let mut builder = HttpRequest::builder().method(method).uri(uri);
+        let content_length = body.len();
+        let mut content_type = String::new();
+        for (key, value) in headers {
+            if key.to_lowercase() == CONTENT_TYPE.as_str().to_lowercase() {
+                content_type = value.clone();
+            }
+            builder = builder.header(key, value);
+        }
+
+        let req = builder
+            .header(CONTENT_LENGTH, body.len())
+            .body(body.to_vec())
+            .unwrap();
+
+        let args = parse_query(req.uri().query());
+        let mut data = HashMap::new();
+        if content_length > 0 {
+            data = match content_type.as_str() {
+                "application/json" => parse_json_body(req.body()),
+                _ => {
+                    warn!("unsupported content type {}", content_type);
+                    HashMap::new()
+                }
+            };
+        }
+        Self {
+            req,
+            args,
+            data,
+            params: HashMap::new(),
+        }
+    }
+    pub fn from(conn: &mut Conn) -> Self {
         // parse method, uri and version
         let mut buf = String::new();
         conn.read_line(&mut buf);

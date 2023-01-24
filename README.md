@@ -86,11 +86,9 @@ content-type: application/json
 - [x] Middleware
 - [x] Cookie
 - [x] Thread pool
-- [ ] Tests
-    - [ ] self tests
-    - [ ] app tests
+- [x] Tests
+- [ ] Database
 - [ ] Static files
 - [ ] HTTP2
-- [ ] Database
 - [ ] Deployment
 

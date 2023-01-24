@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use cookie::Cookie;
-use http::header::{COOKIE, SET_COOKIE};
+use http::header::SET_COOKIE;
 use serde_json::json;
 use web::{
     middleware::{self, DynHandler},

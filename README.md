@@ -84,13 +84,13 @@ content-type: application/json
 - [x] Response & JSON output
 - [x] Redirect
 - [x] Middleware
+- [x] Cookie
 - [x] Thread pool
 - [ ] Tests
     - [ ] self tests
     - [ ] app tests
 - [ ] Static files
 - [ ] HTTP2
-- [ ] Session and Cookie
 - [ ] Database
 - [ ] Deployment
 

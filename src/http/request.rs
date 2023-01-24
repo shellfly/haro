@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use http::{header::CONTENT_LENGTH, Method, Request as HttpRequest, Version};
+use cookie::Cookie;
+use http::{
+    header::{CONTENT_LENGTH, COOKIE},
+    HeaderMap, HeaderValue, Method, Request as HttpRequest, Version,
+};
 
 use crate::http::{
     conn::Conn,
@@ -67,6 +71,28 @@ impl Request {
 
     pub fn path(&self) -> &str {
         self.req.uri().path()
+    }
+
+    pub fn headers(&self) -> &HeaderMap<HeaderValue> {
+        self.req.headers()
+    }
+
+    pub fn cookies(&self) -> HashMap<String, String> {
+        let headers = self.headers();
+        let cookies = headers
+            .get(COOKIE)
+            .and_then(|v| Some(Cookie::split_parse(v.to_str().unwrap())));
+
+        let mut cookies_map = HashMap::new();
+        if let Some(cookies) = cookies {
+            for cookie in cookies {
+                if let Ok(cookie) = cookie {
+                    cookies_map.insert(cookie.name().to_string(), cookie.value().to_string());
+                }
+            }
+        }
+
+        cookies_map
     }
 
     pub fn full_path(&self) -> &str {

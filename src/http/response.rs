@@ -2,7 +2,7 @@ use std::{collections::HashMap, fmt::Display, fs, path::Path};
 
 use http::{
     header::{HeaderName, CONTENT_LENGTH, CONTENT_TYPE, LOCATION},
-    Response as HttpResponse, StatusCode,
+    HeaderValue, Response as HttpResponse, StatusCode,
 };
 use serde::Serialize;
 use tinytemplate::TinyTemplate;
@@ -26,25 +26,25 @@ impl Response {
         Self { res }
     }
 
-    // pub fn header<K, V>(self, key: K, value: V) -> Self
-    // where
-    //     HeaderName: TryFrom<K>,
-    //     <HeaderName as TryFrom<K>>::Error: Into<http::Error>,
-    //     HeaderValue: TryFrom<V>,
-    //     <HeaderValue as TryFrom<V>>::Error: Into<http::Error>,
-    // {
-    //     let (mut parts, body) = self.res.into_parts();
-    //     let name = <HeaderName as TryFrom<K>>::try_from(key)
-    //         .map_err(Into::into)
-    //         .unwrap();
-    //     let value = <HeaderValue as TryFrom<V>>::try_from(value)
-    //         .map_err(Into::into)
-    //         .unwrap();
-    //     parts.headers.append(name, value);
-    //     Self {
-    //         res: HttpResponse::from_parts(parts, body),
-    //     }
-    // }
+    pub fn header<K, V>(self, key: K, value: V) -> Self
+    where
+        HeaderName: TryFrom<K>,
+        <HeaderName as TryFrom<K>>::Error: Into<http::Error>,
+        HeaderValue: TryFrom<V>,
+        <HeaderValue as TryFrom<V>>::Error: Into<http::Error>,
+    {
+        let (mut parts, body) = self.res.into_parts();
+        let name = <HeaderName as TryFrom<K>>::try_from(key)
+            .map_err(Into::into)
+            .unwrap();
+        let value = <HeaderValue as TryFrom<V>>::try_from(value)
+            .map_err(Into::into)
+            .unwrap();
+        parts.headers.append(name, value);
+        Self {
+            res: HttpResponse::from_parts(parts, body),
+        }
+    }
 
     pub fn str<T: AsRef<str>>(s: T) -> Self {
         let body = s.as_ref().as_bytes();

@@ -1,7 +1,7 @@
 use std::{collections::HashMap, fmt::Display, fs, path::Path};
 
 use http::{
-    header::{CONTENT_LENGTH, CONTENT_TYPE},
+    header::{HeaderName, CONTENT_LENGTH, CONTENT_TYPE, LOCATION},
     Response as HttpResponse, StatusCode,
 };
 use serde::Serialize;
@@ -13,31 +13,53 @@ pub struct Response {
 }
 
 impl Response {
-    pub fn str<T: AsRef<str>>(s: T) -> Self {
-        let body = s.as_ref().as_bytes().to_vec();
-        let res = HttpResponse::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "text/plain")
+    pub fn new(status: StatusCode, body: &[u8], headers: HashMap<HeaderName, &str>) -> Self {
+        let mut builder = HttpResponse::builder().status(status);
+        for (key, val) in headers {
+            builder = builder.header(key, val);
+        }
+
+        let res = builder
             .header(CONTENT_LENGTH, body.len())
-            .body(body)
+            .body(body.to_vec())
             .unwrap();
         Self { res }
+    }
+
+    // pub fn header<K, V>(self, key: K, value: V) -> Self
+    // where
+    //     HeaderName: TryFrom<K>,
+    //     <HeaderName as TryFrom<K>>::Error: Into<http::Error>,
+    //     HeaderValue: TryFrom<V>,
+    //     <HeaderValue as TryFrom<V>>::Error: Into<http::Error>,
+    // {
+    //     let (mut parts, body) = self.res.into_parts();
+    //     let name = <HeaderName as TryFrom<K>>::try_from(key)
+    //         .map_err(Into::into)
+    //         .unwrap();
+    //     let value = <HeaderValue as TryFrom<V>>::try_from(value)
+    //         .map_err(Into::into)
+    //         .unwrap();
+    //     parts.headers.append(name, value);
+    //     Self {
+    //         res: HttpResponse::from_parts(parts, body),
+    //     }
+    // }
+
+    pub fn str<T: AsRef<str>>(s: T) -> Self {
+        let body = s.as_ref().as_bytes();
+        let headers = HashMap::from([(CONTENT_TYPE, "text/plain")]);
+        Self::new(StatusCode::OK, body, headers)
     }
 
     pub fn json<S>(s: S) -> Self
     where
         S: Serialize,
     {
-        let s = serde_json::to_string(&s).unwrap();
-        let body = s.as_bytes().to_vec();
-        let res = HttpResponse::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "application/json")
-            .header(CONTENT_LENGTH, body.len())
-            .body(body)
-            .unwrap();
-
-        Self { res }
+        let json_body = serde_json::to_vec(&s).unwrap();
+        let body = json_body.as_ref();
+        let headers = HashMap::from([(CONTENT_TYPE, "application/json")]);
+        Self::new(StatusCode::OK, body, headers)
     }
 
     pub fn tmpl<T: AsRef<str>>(name: T, context: HashMap<String, String>) -> Self {
@@ -50,15 +72,9 @@ impl Response {
         tt.add_template(name, &text).unwrap();
         let s = tt.render(name, &context).unwrap();
 
-        let body = s.as_bytes().to_vec();
-        let res = HttpResponse::builder()
-            .status(StatusCode::OK)
-            .header(CONTENT_TYPE, "text/html")
-            .header(CONTENT_LENGTH, body.len())
-            .body(body)
-            .unwrap();
-
-        Self { res }
+        let body = s.as_bytes();
+        let headers = HashMap::from([(CONTENT_TYPE, "text/html")]);
+        Self::new(StatusCode::OK, body, headers)
     }
 }
 
@@ -78,4 +94,15 @@ impl Display for Response {
         // write body
         write!(f, "\r\n{}", std::str::from_utf8(self.res.body()).unwrap())
     }
+}
+
+pub fn redirect(location: &str, permanently: bool) -> Response {
+    let status = if permanently {
+        StatusCode::MOVED_PERMANENTLY
+    } else {
+        StatusCode::FOUND
+    };
+    let body = Vec::new();
+    let headers = HashMap::from([(LOCATION, location)]);
+    Response::new(status, &body, headers)
 }

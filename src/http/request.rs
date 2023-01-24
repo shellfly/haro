@@ -2,9 +2,10 @@ use std::collections::HashMap;
 
 use cookie::Cookie;
 use http::{
-    header::{CONTENT_LENGTH, COOKIE},
+    header::{CONTENT_LENGTH, CONTENT_TYPE, COOKIE},
     HeaderMap, HeaderValue, Method, Request as HttpRequest, Version,
 };
+use log::warn;
 
 use crate::http::{
     conn::Conn,
@@ -38,9 +39,12 @@ impl Request {
 
         // parse headers
         let mut content_length = 0;
+        let mut content_type = String::new();
         for (key, value) in read_headers(conn) {
             if key.to_lowercase() == CONTENT_LENGTH.as_str().to_lowercase() {
                 content_length = value.parse().unwrap();
+            } else if key.to_lowercase() == CONTENT_TYPE.as_str().to_lowercase() {
+                content_type = value.clone();
             }
             builder = builder.header(key, value);
         }
@@ -53,8 +57,14 @@ impl Request {
 
         let args = parse_query(req.uri().query());
         let mut data = HashMap::new();
-        if method == Method::POST && content_length > 0 {
-            data = parse_json_body(req.body())
+        if content_length > 0 {
+            data = match content_type.as_str() {
+                "application/json" => parse_json_body(req.body()),
+                _ => {
+                    warn!("unsupported content type {}", content_type);
+                    HashMap::new()
+                }
+            };
         }
 
         Self {

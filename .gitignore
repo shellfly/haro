@@ -1,3 +1,5 @@
 /target
 .vscode
 *.profraw
+.DS_Store
+*.db

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::Display;
 
+use http::StatusCode;
 use regex::Regex;
 
 use crate::http::request::Request;
@@ -107,5 +108,9 @@ impl Rule {
 }
 
 fn not_found(_req: Request) -> Response {
-    Response::str("404 Not Found")
+    Response::new(
+        StatusCode::NOT_FOUND,
+        "404 Not Found".as_bytes(),
+        HashMap::new(),
+    )
 }

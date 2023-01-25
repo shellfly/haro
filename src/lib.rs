@@ -1,4 +1,5 @@
 mod app;
+pub mod db;
 mod http;
 pub mod middleware;
 mod pool;

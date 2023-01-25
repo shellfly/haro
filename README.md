@@ -87,8 +87,5 @@ content-type: application/json
 - [x] Cookie
 - [x] Thread pool
 - [x] Tests
-- [ ] Database
-- [ ] Static files
+- [x] Database
 - [ ] HTTP2
-- [ ] Deployment
-

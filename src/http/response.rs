@@ -5,7 +5,6 @@ use http::{
     HeaderValue, Response as HttpResponse, StatusCode,
 };
 use serde::Serialize;
-use tinytemplate::TinyTemplate;
 
 #[derive(Debug)]
 pub struct Response {
@@ -63,21 +62,6 @@ impl Response {
         let json_body = serde_json::to_vec(&s).unwrap();
         let body = json_body.as_ref();
         let headers = HashMap::from([(CONTENT_TYPE, "application/json")]);
-        Self::new(StatusCode::OK, body, headers)
-    }
-
-    pub fn tmpl<T: AsRef<str>>(name: T, context: HashMap<String, String>) -> Self {
-        // TODO(optimize): preload template
-        let name = name.as_ref();
-        let dir = env!("CARGO_MANIFEST_DIR");
-        let file_path = Path::new(dir).join("src").join(name);
-        let mut tt = TinyTemplate::new();
-        let text = fs::read_to_string(file_path).unwrap();
-        tt.add_template(name, &text).unwrap();
-        let s = tt.render(name, &context).unwrap();
-
-        let body = s.as_bytes();
-        let headers = HashMap::from([(CONTENT_TYPE, "text/html")]);
         Self::new(StatusCode::OK, body, headers)
     }
 }

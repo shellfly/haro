@@ -9,7 +9,7 @@ pub struct Conn {
 }
 
 impl Conn {
-    pub fn new(stream: TcpStream) -> Self {
+    pub fn from(stream: TcpStream) -> Self {
         let stream_clone = stream.try_clone().expect("clone failed...");
         let reader = BufReader::new(stream);
         let writer = BufWriter::new(stream_clone);

@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::net::TcpStream;
+use std::num::NonZeroUsize;
 use std::sync::Arc;
 use std::{net::TcpListener, thread};
 
@@ -59,6 +60,7 @@ impl Application {
         let (params, handler) = self.router.dispatch(req.path());
         req.params = params;
 
+        // TODO: how much benefits to move applying middlewares at begging to avoid do it every time in a new request.
         let mut dyn_handler = make_dyn_handler(handler);
         // apply middleware in reverse order
         for middleware in self.middlewares.iter().rev() {
@@ -70,7 +72,11 @@ impl Application {
     pub fn run(&self) {
         info!("Started web server on addr {}", self.addr);
         debug!("routes: \n {:}", self.router);
-        let size = thread::available_parallelism().unwrap().get();
+        // TODO: should pool size larger than CPU cores since many can be waiting for I/O
+        let default_pool_size = NonZeroUsize::new(8).unwrap();
+        let size = thread::available_parallelism()
+            .unwrap_or(default_pool_size)
+            .get();
         let pool = ThreadPool::new(size);
 
         let listener = TcpListener::bind(self.addr).unwrap();
@@ -87,7 +93,7 @@ impl Application {
 }
 
 fn handle_connection(router: Router, middlewares: Vec<Arc<Middleware>>, stream: TcpStream) {
-    let mut conn = Conn::new(stream);
+    let mut conn = Conn::from(stream);
     let mut req = Request::from(&mut conn);
     let (params, handler) = router.dispatch(req.path());
     req.params = params;

@@ -22,6 +22,7 @@ Then, on your main.rs:
 
 ```Rust
 use haro::{Application, Request, Response};
+use serde_json::json;
 
 fn main() {
     let mut app = Application::new("0:8000");

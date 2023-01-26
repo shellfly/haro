@@ -29,5 +29,7 @@ rusqlite = { version = "0.28.0", optional = true }
 tera = { version = "1", optional = true}
 
 [features]
+default = []
+full = ["template", "database"]
 template = ["dep:tera"]
 database = ["dep:mysql", "dep:rusqlite", "dep:r2d2", "dep:r2d2_postgres", "dep:r2d2_mysql", "dep:r2d2_sqlite"]

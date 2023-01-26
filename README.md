@@ -88,7 +88,7 @@ The repo contains [more examples](./examples) that show how to put all the piece
   - [x] JSON
   - [x] Cookie
 - [x] Middleware
-- [x] Teamplte (Optional)
+- [x] Template (Optional)
 - [x] Database (Optional)
 - [x] Tests
 - [ ] HTTP2

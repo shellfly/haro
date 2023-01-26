@@ -1,3 +1,5 @@
+// NOTE: add `web` crate with `full` or `database` feature flag to use database utilities.
+
 use mysql::prelude::*;
 use serde::{Deserialize, Serialize};
 use web::{db, Application, Request, Response};

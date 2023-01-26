@@ -1,3 +1,5 @@
+// NOTE: add `web` crate with `full` or `template` feature flag to use database utilities.
+
 use tera::Context;
 use web::{Application, Request, Response};
 

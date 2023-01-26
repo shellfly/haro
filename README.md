@@ -88,4 +88,5 @@ content-type: application/json
 - [x] Thread pool
 - [x] Tests
 - [x] Database
+- [x] Template
 - [ ] HTTP2

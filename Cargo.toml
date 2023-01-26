@@ -14,10 +14,14 @@ serde_json = "1"
 http = "0.2.8"
 cookie = "0.17.0"
 once_cell = "1.17.0"
-r2d2 = "0.8.10"
-r2d2_postgres = "0.18.1"
-r2d2_mysql = "23.0.0"
-r2d2_sqlite = "0.21.0"
-mysql = "23.0.1"
-rusqlite = "0.28.0"
+r2d2 = {version = "0.8.10", optional = true }
+r2d2_postgres = { version = "0.18.1", optional = true }
+r2d2_mysql = { version = "23.0.0", optional = true }
+r2d2_sqlite = { version = "0.21.0", optional = true }
+mysql = { version = "23.0.1", optional = true }
+rusqlite = { version = "0.28.0", optional = true }
+tera = { version = "1", optional = true}
 
+[features]
+template = ["dep:tera"]
+database = ["dep:mysql", "dep:rusqlite", "dep:r2d2", "dep:r2d2_postgres", "dep:r2d2_mysql", "dep:r2d2_sqlite"]

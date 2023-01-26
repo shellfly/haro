@@ -4,7 +4,13 @@ use http::{
     header::{HeaderName, CONTENT_LENGTH, CONTENT_TYPE, LOCATION},
     HeaderValue, Response as HttpResponse, StatusCode,
 };
+use log::error;
 use serde::Serialize;
+
+#[cfg(feature = "template")]
+use crate::template::TEMPLATES;
+#[cfg(feature = "template")]
+use tera::Context;
 
 /// HTTP Response
 #[derive(Debug)]
@@ -91,6 +97,34 @@ impl Response {
         let body = json_body.as_ref();
         let headers = HashMap::from([(CONTENT_TYPE, "application/json")]);
         Self::new(StatusCode::OK, body, headers)
+    }
+
+    /// Generate a response by a template
+    /// # Example
+    /// ```no_run
+    /// use tera::Context;
+    /// use web::Response;
+    ///
+    /// let context = Context::new();
+    /// let res = Response::tmpl("index.html", context);
+    /// ```
+    #[cfg(feature = "template")]
+    pub fn tmpl(name: &str, context: Context) -> Self {
+        let mut status = StatusCode::OK;
+        let body = match TEMPLATES.render(name, &context) {
+            Ok(body) => body,
+            Err(error) => {
+                error!(
+                    "failed to render template: {}, context: {:?}, error: {}",
+                    name, context, error
+                );
+                status = StatusCode::INTERNAL_SERVER_ERROR;
+                String::new()
+            }
+        };
+
+        let headers = HashMap::from([(CONTENT_TYPE, "text/html")]);
+        Self::new(status, body.as_bytes(), headers)
     }
 }
 

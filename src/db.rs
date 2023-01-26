@@ -1,6 +1,4 @@
 //! Database utilities
-//!
-//!
 use mysql::{Opts, OptsBuilder};
 use once_cell::sync::OnceCell;
 use r2d2::{Pool, PooledConnection};

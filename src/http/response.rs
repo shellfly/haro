@@ -43,6 +43,11 @@ impl Response {
         Self { res }
     }
 
+    /// Returns status code of the `Response`
+    pub fn status(&self) -> StatusCode {
+        self.res.status()
+    }
+
     /// Returns body of the `Response`
     pub fn body(&self) -> &[u8] {
         self.res.body()

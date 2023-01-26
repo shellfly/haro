@@ -1,5 +1,8 @@
 # Haro
 
+![ci](https://github.com/shellfly/haro/actions/workflows/ci.yml/badge.svg)
+[![crates.io](https://img.shields.io/crates/v/haro.svg)](https://crates.io/crates/haro)
+
 **Haro** is a **simple** and **synchronous** web framework written in and for Rust.
 
 The project was named after the [Haro character](https://en.wikipedia.org/wiki/Haro_(character)). The application interface was inspired by the [web.py](https://webpy.org/) project.

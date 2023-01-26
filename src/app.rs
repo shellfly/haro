@@ -169,3 +169,13 @@ fn handle_connection(router: Router, middlewares: Vec<Arc<Middleware>>, stream: 
     conn.write_all(res.to_string().as_bytes());
     conn.flush();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Application;
+
+    #[test]
+    fn it_works() {
+        let app = Application::new("0:65530").num_threads(2);
+    }
+}

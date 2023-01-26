@@ -1,8 +1,8 @@
 # web.rs
 
-web.rs is a web framework for Rust that is as simple as it is powerful.
+**web.rs** is a **simple** and **synchronous** web framework written in and for Rust.
 
-Visit https://webrs.org/ for more information.
+The application interface was inspired by the [web.py](https://webpy.org/) project.
 
 ## Motivation
 > In short, async Rust is more difficult to use and can result in a higher maintenance burden than synchronous Rust, but gives you best-in-class performance in return. All areas of async Rust are constantly improving, so the impact of these issues will wear off over time
@@ -11,7 +11,7 @@ Visit https://webrs.org/ for more information.
 
 As the async book says, while bringing performance, async Rust can result in a higher maintenance burden. The goal of this project is to create a simple and minimum synchronous Web framework for Rust.
 
-## Example
+## Quick Start
 
 Add `web` as a dependency by cargo
 ```bash
@@ -73,6 +73,11 @@ content-type: application/json
     }
 }
 ```
+
+## More Examples
+
+The repo contains [some examples](./examples) that show how to put all the pieces together.
+
 ## Features
 
 - [x] URL Routing with plain fn pointer
@@ -86,3 +91,14 @@ content-type: application/json
 - [x] Database (Optional)
 - [x] Tests
 - [ ] HTTP2
+
+
+
+## License
+
+Licensed under either of
+
+ * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+ * MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+
+at your option.

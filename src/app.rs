@@ -12,43 +12,91 @@ use crate::pool::ThreadPool;
 use crate::router::{Handler, Router};
 use crate::{Request, Response};
 
+/// A web Application with routes and middlewares
 pub struct Application {
     addr: &'static str,
+    num_threads: NonZeroUsize,
     router: Router,
     middlewares: Vec<Arc<Middleware>>,
 }
 
 impl Application {
+    /// Create a new `Application` instance
+    /// # Examples
     /// ```
-    /// use std::collections::HashMap;
-    /// use web::{Application, Request, Response};
-    /// fn test_handler(_:Request) -> Response {
-    ///     Response::str("test")
-    /// }
+    /// use web::Application;
+    ///
     /// let mut app = Application::new("0:12345");
-    /// app.route("/", test_handler);
-    /// let res = app.request("get", "/", HashMap::new(), &Vec::new());
-    /// assert_eq!("test".as_bytes(), res.body());
     /// ```
     pub fn new(addr: &'static str) -> Self {
         env_logger::init();
         let router = Router::default();
         let middlewares = Vec::new();
+        let default_num_threads = NonZeroUsize::new(8).unwrap();
         Self {
             addr,
+            num_threads: default_num_threads,
             router,
             middlewares,
         }
     }
 
+    /// Set thread worker pool size for `Application`
+    /// # Examples
+    /// ```
+    /// use web::Application;
+    ///
+    /// let mut app = Application::new("0:8080").num_threads(64);
+    /// ```
+    pub fn num_threads(mut self, n: usize) -> Self {
+        self.num_threads = NonZeroUsize::new(n).unwrap();
+        self
+    }
+
+    /// Add a middleware into an `Application`
+    /// # Example
+    /// ```
+    /// use web::{Application, middleware};
+    ///
+    /// let mut app = Application::new("0:8080");
+    /// app.middleware(middleware::logging);
+    /// ```
     pub fn middleware(&mut self, middleware: Middleware) {
         self.middlewares.push(Arc::new(middleware));
     }
 
+    /// Add a route into an `Application`
+    /// # Example
+    /// ```
+    /// use web::{Application, Request, Response, middleware};
+    ///
+    /// let mut app = Application::new("0:8080");
+    /// app.route("/", index);
+    ///
+    /// fn index(_:Request) -> Response {
+    ///     Response::str("hello web.rs")
+    /// }
+    /// ```
     pub fn route(&mut self, pattern: &'static str, handler: Handler) {
         self.router.add(pattern, handler);
     }
 
+    /// Send a request to an `Application`, usually used in test
+    /// # Examples
+    /// ```
+    /// use std::collections::HashMap;
+    /// use web::{Application, Request, Response};
+    ///
+    /// fn test_handler(_:Request) -> Response {
+    ///     Response::str("test")
+    /// }
+    ///
+    /// let mut app = Application::new("0:12345");
+    /// app.route("/", test_handler);
+    ///
+    /// let res = app.request("get", "/", HashMap::new(), &Vec::new());
+    /// assert_eq!("test".as_bytes(), res.body());
+    /// ```
     pub fn request(
         &self,
         method: &str,
@@ -69,6 +117,19 @@ impl Application {
         dyn_handler(req)
     }
 
+    /// Run the application, start listening on the specify address and start a worker pool to handle requests
+    /// # Examples
+    /// ```
+    /// use std::collections::HashMap;
+    /// use web::{Application, Request, Response};
+    ///
+    /// fn test_handler(_:Request) -> Response {
+    ///     Response::str("test")
+    /// }
+    ///
+    /// let mut app = Application::new("0:12345");
+    /// app.run()
+    /// ```
     pub fn run(&self) {
         info!("Started web server on addr {}", self.addr);
         debug!("routes: \n {:}", self.router);

@@ -1,3 +1,20 @@
+//! # web
+//!
+//! web is a **simple** and **synchronous** web framework written in and for Rust.
+//!
+//! ## Features
+//!
+//! - Routing with plain fn pointer
+//! - Request & Response with minimal boilerplate
+//!   - Query args
+//!   - Post data
+//!   - JSON
+//!   - Cookie
+//! - Middleware
+//! - Database
+//! - Tests
+//!
+
 mod app;
 pub mod db;
 mod http;

@@ -12,6 +12,7 @@ use crate::http::{
     utils::{parse_json_body, parse_query, read_headers},
 };
 
+/// HTTP Request
 #[derive(Debug)]
 pub struct Request {
     req: HttpRequest<Vec<u8>>,
@@ -21,6 +22,16 @@ pub struct Request {
 }
 
 impl Request {
+    /// Create a new `Request`
+    /// # Example
+    /// ```
+    /// use std::collections::HashMap;
+    /// use web::Request;
+    ///
+    /// let headers = HashMap::new();
+    /// let body = &Vec::new();
+    /// let mut req = Request::new("get", "/", headers, body);
+    /// ```
     pub fn new(method: &str, uri: &str, headers: HashMap<String, String>, body: &[u8]) -> Self {
         let mut builder = HttpRequest::builder().method(method).uri(uri);
         let content_length = body.len();
@@ -55,6 +66,7 @@ impl Request {
             params: HashMap::new(),
         }
     }
+    /// Create a new `Request` from a TCP connectio
     pub fn from(conn: &mut Conn) -> Self {
         // parse method, uri and version
         let mut buf = String::new();
@@ -109,18 +121,30 @@ impl Request {
         }
     }
 
+    /// HTTP method for current `Request`
     pub fn method(&self) -> &str {
         self.req.method().as_str()
     }
 
+    /// HTTP path for current `Request`
     pub fn path(&self) -> &str {
         self.req.uri().path()
     }
 
+    /// HTTP full path with query args
+    pub fn full_path(&self) -> &str {
+        if let Some(full_path) = self.req.uri().path_and_query() {
+            return full_path.as_str();
+        }
+        ""
+    }
+
+    /// HTTP headers for current `Request`
     pub fn headers(&self) -> &HeaderMap<HeaderValue> {
         self.req.headers()
     }
 
+    /// HTTP cookies for current `Request`
     pub fn cookies(&self) -> HashMap<String, String> {
         let headers = self.headers();
         let cookies = headers
@@ -133,12 +157,5 @@ impl Request {
         }
 
         cookies_map
-    }
-
-    pub fn full_path(&self) -> &str {
-        if let Some(full_path) = self.req.uri().path_and_query() {
-            return full_path.as_str();
-        }
-        ""
     }
 }

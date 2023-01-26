@@ -6,12 +6,24 @@ use http::{
 };
 use serde::Serialize;
 
+/// HTTP Response
 #[derive(Debug)]
 pub struct Response {
     res: HttpResponse<Vec<u8>>,
 }
 
 impl Response {
+    /// Create a new `Response`
+    /// # Examples
+    /// ```
+    /// use std::collections::HashMap;
+    /// use http::StatusCode;
+    /// use web::Resposne;
+    ///
+    /// let body = &Vec::new()
+    /// let headers = HashMap::new();
+    /// let res = Response::new(StatusCode::OK, body, headers);
+    /// ```
     pub fn new(status: StatusCode, body: &[u8], headers: HashMap<HeaderName, &str>) -> Self {
         let mut builder = HttpResponse::builder().status(status);
         for (key, val) in headers {
@@ -25,10 +37,12 @@ impl Response {
         Self { res }
     }
 
+    /// Returns body of the `Response`
     pub fn body(&self) -> &[u8] {
         self.res.body()
     }
 
+    /// Set a new header, generate and return a new `Response`
     pub fn header<K, V>(self, key: K, value: V) -> Self
     where
         HeaderName: TryFrom<K>,
@@ -49,12 +63,26 @@ impl Response {
         }
     }
 
+    /// Generate plain text response
+    /// # Example
+    /// ```
+    /// use web::Response;
+    ///
+    /// let res = Response::str("Hello web.rs");
+    /// ```
     pub fn str<T: AsRef<str>>(s: T) -> Self {
         let body = s.as_ref().as_bytes();
         let headers = HashMap::from([(CONTENT_TYPE, "text/plain")]);
         Self::new(StatusCode::OK, body, headers)
     }
 
+    /// Generate JSON response
+    /// # Example
+    /// ```
+    /// use web::Response;
+    ///
+    /// let res = Response::json("{\"hello\":\"world\"}");
+    /// ```
     pub fn json<S>(s: S) -> Self
     where
         S: Serialize,
@@ -84,6 +112,7 @@ impl Display for Response {
     }
 }
 
+/// redirect is a helper function to generate 301 or 302 [`Response`]
 pub fn redirect(location: &str, permanently: bool) -> Response {
     let status = if permanently {
         StatusCode::MOVED_PERMANENTLY

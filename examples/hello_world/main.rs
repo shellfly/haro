@@ -1,5 +1,5 @@
+use haro::{Application, Request, Response};
 use serde_json::json;
-use web::{Application, Request, Response};
 
 fn main() {
     let mut app = Application::new("0:8080");
@@ -10,7 +10,7 @@ fn main() {
 }
 
 fn index(_: Request) -> Response {
-    Response::str("Hello web.rs")
+    Response::str("Hello Haro")
 }
 
 fn hello(req: Request) -> Response {

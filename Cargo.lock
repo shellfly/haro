@@ -763,6 +763,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "haro"
+version = "0.1.0"
+dependencies = [
+ "cookie",
+ "env_logger",
+ "http",
+ "log",
+ "mysql",
+ "once_cell",
+ "r2d2",
+ "r2d2_mysql",
+ "r2d2_postgres",
+ "r2d2_sqlite",
+ "regex",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tera",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.11.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2382,27 +2403,6 @@ name = "wasm-bindgen-shared"
 version = "0.2.83"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c38c045535d93ec4f0b4defec448e4291638ee608530863b1e2ba115d4fff7f"
-
-[[package]]
-name = "web"
-version = "0.1.0"
-dependencies = [
- "cookie",
- "env_logger",
- "http",
- "log",
- "mysql",
- "once_cell",
- "r2d2",
- "r2d2_mysql",
- "r2d2_postgres",
- "r2d2_sqlite",
- "regex",
- "rusqlite",
- "serde",
- "serde_json",
- "tera",
-]
 
 [[package]]
 name = "winapi"

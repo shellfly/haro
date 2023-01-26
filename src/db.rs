@@ -16,7 +16,7 @@ impl Postgres {
     /// Initialize a global Postgres connection pool by provided `url`
     /// # Example
     /// ```no_run
-    /// use web::db;
+    /// use haro::db;
     ///
     /// db::Postgres::init("postgres://postgres:postgres@localhost:5432/test")
     /// ```
@@ -29,7 +29,7 @@ impl Postgres {
     /// Retrieve a connection from the global Postgres connection pool
     /// # Example
     /// ```no_run
-    /// use web::db;
+    /// use haro::db;
     ///
     /// let client = db::Postgres::get();
     /// ```
@@ -45,7 +45,7 @@ impl MySQL {
     /// Initialize a global MySQL connection pool by provided `url`
     /// # Example
     /// ```no_run
-    /// use web::db;
+    /// use haro::db;
     ///
     /// db::MySQL::init("mysql://root:root@localhost:3306/test")
     /// ```
@@ -60,7 +60,7 @@ impl MySQL {
     /// Retrieve a connection from the global MySQL connection pool
     /// # Example
     /// ```no_run
-    /// use web::db;
+    /// use haro::db;
     ///
     /// let client = db::MySQL::get();
     /// ```
@@ -76,7 +76,7 @@ impl SQLite {
     /// Initialize a global SQLite connection pool by provided `url`
     /// # Example
     /// ```no_run
-    /// use web::db;
+    /// use haro::db;
     ///
     /// db::SQLite::init("test.db")
     /// ```
@@ -89,7 +89,7 @@ impl SQLite {
     /// Retrieve a connection from the global SQLite connection pool
     /// # Example
     /// ```no_run
-    /// use web::db;
+    /// use haro::db;
     ///
     /// let client = db::SQLite::get();
     /// ```

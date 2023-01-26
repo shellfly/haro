@@ -3,7 +3,7 @@ use std::sync::Arc;
 use cookie::Cookie;
 use http::header::SET_COOKIE;
 use serde_json::json;
-use web::{
+use haro::{
     middleware::{self, DynHandler},
     Application, Request, Response,
 };
@@ -18,7 +18,7 @@ fn main() {
 }
 
 fn index(_: Request) -> Response {
-    Response::str("Hello web.rs")
+    Response::str("Hello Haro")
 }
 
 fn hello(req: Request) -> Response {

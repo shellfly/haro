@@ -1,27 +1,27 @@
-# web.rs
+# Haro
 
-**web.rs** is a **simple** and **synchronous** web framework written in and for Rust.
+**Haro** is a **simple** and **synchronous** web framework written in and for Rust.
 
-The application interface was inspired by the [web.py](https://webpy.org/) project.
+The project was named after the [Haro character](https://en.wikipedia.org/wiki/Haro_(character)). The application interface was inspired by the [web.py](https://webpy.org/) project.
 
 ## Motivation
 > In short, async Rust is more difficult to use and can result in a higher maintenance burden than synchronous Rust, but gives you best-in-class performance in return. All areas of async Rust are constantly improving, so the impact of these issues will wear off over time
 >
 > https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html
 
-As the async book says, while bringing performance, async Rust can result in a higher maintenance burden. The goal of this project is to create a simple and minimum synchronous Web framework for Rust.
+As the async book says, async Rust is not mature yet. While bringing performance, it also results in a higher maintenance burden. The goal of this project is to create a simple and minimum synchronous Web framework for Rust.
 
 ## Quick Start
 
-Add `web` as a dependency by cargo
+Add `haro` as a dependency by cargo
 ```bash
-cargo add web
+cargo add haro
 ```
 
 Then, on your main.rs:
 
 ```Rust
-use web::{Application, Request, Response};
+use haro::{Application, Request, Response};
 
 fn main() {
     let mut app = Application::new("0:8000");
@@ -31,7 +31,7 @@ fn main() {
 }
 
 fn index(_: Request) -> Response {
-    Response::str("Hello web.rs")
+    Response::str("Hello Haro")
 }
 
 fn hello(req: Request) -> Response {
@@ -51,7 +51,7 @@ HTTP/1.1 200 OK
 content-length: 12
 content-type: text/plain
 
-Hello web.rs
+Hello Haro
 ```
 
 ```bash
@@ -76,7 +76,7 @@ content-type: application/json
 
 ## More Examples
 
-The repo contains [some examples](./examples) that show how to put all the pieces together.
+The repo contains [more examples](./examples) that show how to put all the pieces together.
 
 ## Features
 

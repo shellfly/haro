@@ -1,6 +1,6 @@
-//! # web
+//! # Haro
 //!
-//! web is a **simple** and **synchronous** web framework written in and for Rust.
+//! Haro is a **simple** and **synchronous** web framework written in and for Rust.
 //!
 //! ## Features
 //!
@@ -17,10 +17,10 @@
 //!
 //! ## Example
 //!
-//! The "Hello, World!" of web is:
+//! The "Hello, World!" of Haro is:
 //!
 //! ```rust,no_run
-//! use web::{Applicatoin,  Request, Response}
+//! use haro::{Applicatoin,  Request, Response}
 //!
 //! fn main() {
 //!     let mut app = Application::new("0:8000");
@@ -29,13 +29,13 @@
 //! }
 //!
 //! fn hello(_: Request) -> Response {
-//!     Response::str("Hello web.rs")
+//!     Response::str("Hello Haro")
 //! }
 //! ```
 //!
 //! ## Optional Features
 //!
-//! web uses a set of [feature flags] to reduce the amount of compiled code and
+//! Haro uses a set of [feature flags] to reduce the amount of compiled code and
 //! optional dependencies.
 //!
 //! You can also use the `full` feature flag which will enable all public APIs.
@@ -50,10 +50,10 @@
 //!
 //! ## Examples
 //!
-//! The web repo contains [a number of examples][examples] that show how to put all the
+//! The Haro repo contains [a number of examples][examples] that show how to put all the
 //! pieces together.
 //!
-//! [examples]: https://github.com/shellfly/web.rs/tree/main/examples
+//! [examples]: https://github.com/shellfly/haro/tree/main/examples
 //!
 mod app;
 mod http;

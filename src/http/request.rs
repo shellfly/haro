@@ -26,7 +26,7 @@ impl Request {
     /// # Example
     /// ```
     /// use std::collections::HashMap;
-    /// use web::Request;
+    /// use haro::Request;
     ///
     /// let headers = HashMap::new();
     /// let body = &Vec::new();
@@ -107,6 +107,7 @@ impl Request {
             data = match content_type.as_str() {
                 "application/json" => parse_json_body(req.body()),
                 _ => {
+                    // TODO: support more content types
                     warn!("unsupported content type {}", content_type);
                     HashMap::new()
                 }

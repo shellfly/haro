@@ -1,5 +1,5 @@
+use haro::{Application, Request, Response};
 use serde_json::json;
-use web::{Application, Request, Response};
 
 fn main() {
     let app = build_app();
@@ -15,7 +15,7 @@ fn build_app() -> Application {
 }
 
 fn index(_: Request) -> Response {
-    Response::str("Hello web.rs")
+    Response::str("Hello Haro")
 }
 
 fn hello(req: Request) -> Response {
@@ -38,6 +38,6 @@ mod tests {
     fn it_works() {
         let app = build_app();
         let res = app.request("get", "/", HashMap::new(), &Vec::new());
-        assert_eq!("Hello web.rs".as_bytes(), res.body());
+        assert_eq!("Hello Haro".as_bytes(), res.body());
     }
 }

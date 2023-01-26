@@ -24,7 +24,7 @@ impl Application {
     /// Create a new `Application` instance
     /// # Examples
     /// ```
-    /// use web::Application;
+    /// use haro::Application;
     ///
     /// let mut app = Application::new("0:12345");
     /// ```
@@ -44,7 +44,7 @@ impl Application {
     /// Set thread worker pool size for `Application`
     /// # Examples
     /// ```
-    /// use web::Application;
+    /// use haro::Application;
     ///
     /// let mut app = Application::new("0:8080").num_threads(64);
     /// ```
@@ -56,7 +56,7 @@ impl Application {
     /// Add a middleware into an `Application`
     /// # Example
     /// ```
-    /// use web::{Application, middleware};
+    /// use haro::{Application, middleware};
     ///
     /// let mut app = Application::new("0:8080");
     /// app.middleware(middleware::logging);
@@ -68,13 +68,13 @@ impl Application {
     /// Add a route into an `Application`
     /// # Example
     /// ```
-    /// use web::{Application, Request, Response, middleware};
+    /// use haro::{Application, Request, Response, middleware};
     ///
     /// let mut app = Application::new("0:8080");
     /// app.route("/", index);
     ///
     /// fn index(_:Request) -> Response {
-    ///     Response::str("hello web.rs")
+    ///     Response::str("Hello Haro")
     /// }
     /// ```
     pub fn route(&mut self, pattern: &'static str, handler: Handler) {
@@ -85,7 +85,7 @@ impl Application {
     /// # Examples
     /// ```
     /// use std::collections::HashMap;
-    /// use web::{Application, Request, Response};
+    /// use haro::{Application, Request, Response};
     ///
     /// fn test_handler(_:Request) -> Response {
     ///     Response::str("test")
@@ -121,7 +121,7 @@ impl Application {
     /// # Examples
     /// ```
     /// use std::collections::HashMap;
-    /// use web::{Application, Request, Response};
+    /// use haro::{Application, Request, Response};
     ///
     /// fn test_handler(_:Request) -> Response {
     ///     Response::str("test")

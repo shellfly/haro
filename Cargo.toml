@@ -1,10 +1,10 @@
 [package]
-name = "web"
+name = "haro"
 version = "0.1.0"
 edition = "2021"
 description = "A simple and synchronous web framework written in and for Rust"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/shellfly/web.rs/"
+repository = "https://github.com/shellfly/haro/"
 keywords = ["http", "web", "framework"]
 categories = ["network-programming", "web-programming::http-server"]
 

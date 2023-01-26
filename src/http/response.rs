@@ -24,7 +24,7 @@ impl Response {
     /// ```
     /// use std::collections::HashMap;
     /// use http::StatusCode;
-    /// use web::Resposne;
+    /// use haro::Resposne;
     ///
     /// let body = &Vec::new()
     /// let headers = HashMap::new();
@@ -72,9 +72,9 @@ impl Response {
     /// Generate plain text response
     /// # Example
     /// ```
-    /// use web::Response;
+    /// use haro::Response;
     ///
-    /// let res = Response::str("Hello web.rs");
+    /// let res = Response::str("Hello Haro");
     /// ```
     pub fn str<T: AsRef<str>>(s: T) -> Self {
         let body = s.as_ref().as_bytes();
@@ -85,7 +85,7 @@ impl Response {
     /// Generate JSON response
     /// # Example
     /// ```
-    /// use web::Response;
+    /// use haro::Response;
     ///
     /// let res = Response::json("{\"hello\":\"world\"}");
     /// ```
@@ -103,7 +103,7 @@ impl Response {
     /// # Example
     /// ```no_run
     /// use tera::Context;
-    /// use web::Response;
+    /// use haro::Response;
     ///
     /// let context = Context::new();
     /// let res = Response::tmpl("index.html", context);

@@ -33,7 +33,7 @@ pub type Middleware = fn(next: DynHandler) -> DynHandler;
 /// Logging middleware to log every request and response time
 /// # Example
 /// ```
-/// use web::{Application, middleware}
+/// use haro::{Application, middleware}
 ///
 /// let mut app = Application::new("0:8080");
 /// app.middleware(middleware::logging);
@@ -56,7 +56,7 @@ pub fn logging(next: DynHandler) -> DynHandler {
 /// Change a fn pointer to a closure
 /// # Example
 /// ```
-/// use web::{Request, Response, middleware};
+/// use haro::{Request, Response, middleware};
 ///
 /// fn handler(_:Request) -> Response{
 ///     Response::str("hello")

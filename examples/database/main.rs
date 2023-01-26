@@ -1,11 +1,11 @@
-// NOTE: add `web` crate with `full` or `database` feature flag to use database utilities.
+// NOTE: add `haro` crate with `full` or `database` feature flag to use database utilities.
 
+use haro::{db, Application, Request, Response};
 use mysql::prelude::*;
 use serde::{Deserialize, Serialize};
-use web::{db, Application, Request, Response};
 
 fn main() {
-    db::Postgres::init("postgres://postgres:postgres@localhost:5432/test");
+    db::Postgres::init("postgres://postgres:postgres@localhost:5432/ci");
     db::MySQL::init("mysql://root:root@localhost:3306/test");
     db::SQLite::init("test.db");
 

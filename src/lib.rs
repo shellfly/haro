@@ -4,7 +4,7 @@
 //!
 //! ## Features
 //!
-//! - Routing with plain fn pointer
+//! - URL Routing with plain fn pointer
 //! - Request & Response with minimal boilerplate
 //!   - Query args
 //!   - Post data

@@ -73,20 +73,16 @@ content-type: application/json
     }
 }
 ```
-## Road map
+## Features
 
-- [x] query & headers
-- [x] URL route
-- [x] Template
-- [ ] Post
-    - [ ] Forms
-    - [x] JSON
-- [x] Response & JSON output
-- [x] Redirect
+- [x] URL Routing with plain fn pointer
+- [x] Request & Response with minimal boilerplate
+  - [x] Query args
+  - [x] Post data
+  - [x] JSON
+  - [x] Cookie
 - [x] Middleware
-- [x] Cookie
-- [x] Thread pool
+- [x] Teamplte (Optional)
+- [x] Database (Optional)
 - [x] Tests
-- [x] Database
-- [x] Template
 - [ ] HTTP2

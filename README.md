@@ -2,6 +2,7 @@
 
 ![ci](https://github.com/shellfly/haro/actions/workflows/ci.yml/badge.svg)
 [![crates.io](https://img.shields.io/crates/v/haro.svg)](https://crates.io/crates/haro)
+[![chat](https://img.shields.io/badge/chat-discord-brightgreen)](https://discord.gg/AktRUJKphe)
 
 **Haro** is a **simple** and **synchronous** web framework written in and for Rust.
 

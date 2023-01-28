@@ -1,9 +1,6 @@
 use std::sync::Arc;
 
-use haro::{
-    middleware::{self, DynHandler},
-    Application, Request, Response,
-};
+use haro::{middleware, Application, DynHandler, Request, Response};
 use serde_json::json;
 
 fn main() {

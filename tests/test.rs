@@ -1,8 +1,4 @@
-use haro::{
-    db,
-    middleware::{self, DynHandler},
-    Application, Request, Response,
-};
+use haro::{db, middleware, Application, DynHandler, Request, Response};
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::json;

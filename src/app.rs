@@ -7,9 +7,9 @@ use std::{net::TcpListener, thread};
 use log::{debug, info};
 
 use crate::http::conn::Conn;
-use crate::middleware::{make_dyn_handler, Middleware};
+use crate::middleware::Middleware;
 use crate::pool::ThreadPool;
-use crate::router::{Handler, Router};
+use crate::router::{make_dyn_handler, DynHandler, Handler, Router};
 use crate::{Request, Response};
 
 /// A web Application with routes and middlewares
@@ -65,7 +65,7 @@ impl Application {
         self.middlewares.push(Arc::new(middleware));
     }
 
-    /// Add a route into an `Application`
+    /// Add a route using plain `fn` pointer
     /// # Example
     /// ```
     /// use haro::{Application, Request, Response, middleware};
@@ -78,6 +78,24 @@ impl Application {
     /// }
     /// ```
     pub fn route(&mut self, pattern: &'static str, handler: Handler) {
+        self.route_dyn(pattern, make_dyn_handler(handler))
+    }
+
+    /// Add a route using closure
+    /// # Example
+    /// ```
+    /// use std::sync::Arc;
+    /// use haro::{Application, DynHandler, Response};
+    ///
+    /// let mut app = Application::new("0:8080");
+    /// app.route_dyn("/", hello("Haro"));
+    ///
+    /// fn hello(name: &str) -> DynHandler {
+    ///   let name = name.to_string();
+    ///   Arc::new(move |_| Response::str(&name))
+    /// }
+    /// ```
+    pub fn route_dyn(&mut self, pattern: &'static str, handler: DynHandler) {
         self.router.add(pattern, handler);
     }
 
@@ -105,21 +123,20 @@ impl Application {
         body: &[u8],
     ) -> Response {
         let mut req = Request::new(method, uri, headers, body);
-        let (params, handler) = self.router.dispatch(req.path());
+        let (params, mut handler) = self.router.dispatch(req.path());
         req.params = params;
 
         // TODO: how much benefits to move applying middlewares at begging to avoid do it every time in a new request.
-        let mut dyn_handler = make_dyn_handler(handler);
         // apply middleware in reverse order
         for middleware in self.middlewares.iter().rev() {
-            dyn_handler = middleware(dyn_handler);
+            handler = middleware(handler);
         }
-        dyn_handler(req)
+        handler(req)
     }
 
     /// Run the application, start listening on the specify address and start a worker pool to handle requests
     /// # Examples
-    /// ```
+    /// ```no_run
     /// use std::collections::HashMap;
     /// use haro::{Application, Request, Response};
     ///
@@ -156,15 +173,14 @@ impl Application {
 fn handle_connection(router: Router, middlewares: Vec<Arc<Middleware>>, stream: TcpStream) {
     let mut conn = Conn::from(stream);
     let mut req = Request::from(&mut conn);
-    let (params, handler) = router.dispatch(req.path());
+    let (params, mut handler) = router.dispatch(req.path());
     req.params = params;
 
-    let mut dyn_handler = make_dyn_handler(handler);
     // apply middleware in reverse order
     for middleware in middlewares.iter().rev() {
-        dyn_handler = middleware(dyn_handler);
+        handler = middleware(handler);
     }
-    let res = dyn_handler(req);
+    let res = handler(req);
 
     conn.write_all(res.to_string().as_bytes());
     conn.flush();
@@ -176,6 +192,6 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let app = Application::new("0:65530").num_threads(2);
+        Application::new("0:65530").num_threads(2);
     }
 }

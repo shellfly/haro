@@ -1,7 +1,7 @@
 // NOTE: add `haro` crate with `full` or `template` feature flag to use database utilities.
 
-use tera::Context;
 use haro::{Application, Request, Response};
+use tera::Context;
 
 fn main() {
     let mut app = Application::new("0:8080");

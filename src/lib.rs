@@ -20,7 +20,7 @@
 //! The "Hello, World!" of Haro is:
 //!
 //! ```rust,no_run
-//! use haro::{Applicatoin,  Request, Response}
+//! use haro::{Application,  Request, Response};
 //!
 //! fn main() {
 //!     let mut app = Application::new("0:8000");
@@ -64,7 +64,7 @@ mod router;
 pub use crate::app::Application;
 pub use crate::http::request::Request;
 pub use crate::http::response::{redirect, Response};
-
+pub use crate::router::{make_dyn_handler, DynHandler, Handler};
 #[cfg(feature = "template")]
 mod template;
 

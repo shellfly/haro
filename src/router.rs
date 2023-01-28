@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::fmt::Display;
+use std::sync::Arc;
 
 use http::StatusCode;
 use regex::Regex;
@@ -7,15 +8,18 @@ use regex::Regex;
 use crate::http::request::Request;
 use crate::http::response::Response;
 
+/// Handler type that receive a [`Request`] and return a [`Response`]
 pub type Handler = fn(Request) -> Response;
+/// Closure type of handler in order to write a handler to capture environment variables
+pub type DynHandler = Arc<dyn Fn(Request) -> Response + Send + Sync>;
 
 #[derive(Default, Clone)]
 pub struct Router {
-    routes: Vec<(Rule, Handler)>,
+    routes: Vec<(Rule, DynHandler)>,
 }
 
 impl Router {
-    pub fn add(&mut self, pattern: &'static str, handler: Handler) {
+    pub fn add(&mut self, pattern: &'static str, handler: DynHandler) {
         let rule = Rule::from(pattern);
         self.routes.push((rule, handler));
         self.update_order()
@@ -27,13 +31,13 @@ impl Router {
             .sort_by(|a, b| b.0.num_parts.cmp(&a.0.num_parts));
     }
 
-    pub fn dispatch(&self, path: &str) -> (HashMap<String, String>, Handler) {
+    pub fn dispatch(&self, path: &str) -> (HashMap<String, String>, DynHandler) {
         for (rule, handler) in &self.routes {
             if let Some(params) = rule._match(path) {
-                return (params, *handler);
+                return (params, handler.clone());
             }
         }
-        (HashMap::new(), not_found)
+        (HashMap::new(), make_dyn_handler(not_found))
     }
 }
 
@@ -63,7 +67,7 @@ impl From<&'static str> for Rule {
         let mut has_regex = false;
         for part in pattern.split('/') {
             if let Some(stripped) = part.strip_prefix(':') {
-                let regex_part = format!("(?P<{}>.+)", stripped);
+                let regex_part = format!("(?P<{stripped}>.+)");
                 parts.push(regex_part);
                 has_regex = true
             } else if !part.is_empty() {
@@ -113,4 +117,19 @@ fn not_found(_req: Request) -> Response {
         "404 Not Found".as_bytes(),
         HashMap::new(),
     )
+}
+
+/// Change a fn pointer to a closure
+/// # Example
+/// ```
+/// use haro::{Request, Response, middleware,make_dyn_handler};
+///
+/// fn handler(_:Request) -> Response{
+///     Response::str("hello")
+/// }
+///
+/// let dyn_handler = make_dyn_handler(handler);
+/// ```
+pub fn make_dyn_handler(h: Handler) -> DynHandler {
+    Arc::new(move |req: Request| -> Response { h(req) })
 }

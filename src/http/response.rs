@@ -24,9 +24,9 @@ impl Response {
     /// ```
     /// use std::collections::HashMap;
     /// use http::StatusCode;
-    /// use haro::Resposne;
+    /// use haro::Response;
     ///
-    /// let body = &Vec::new()
+    /// let body = &Vec::new();
     /// let headers = HashMap::new();
     /// let res = Response::new(StatusCode::OK, body, headers);
     /// ```

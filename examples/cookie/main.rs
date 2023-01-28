@@ -1,12 +1,9 @@
 use std::sync::Arc;
 
 use cookie::Cookie;
+use haro::{middleware, Application, DynHandler, Request, Response};
 use http::header::SET_COOKIE;
 use serde_json::json;
-use haro::{
-    middleware::{self, DynHandler},
-    Application, Request, Response,
-};
 
 fn main() {
     let mut app = Application::new("0:8080");
@@ -34,7 +31,7 @@ fn hello(req: Request) -> Response {
 fn session_middleware(next: DynHandler) -> DynHandler {
     Arc::new(move |req: Request| -> Response {
         let cookies = req.cookies();
-        println!("get cookies: {:?}", cookies);
+        println!("get cookies: {cookies:?}");
 
         let mut res = next(req);
 

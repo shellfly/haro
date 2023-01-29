@@ -9,15 +9,15 @@ use log::{debug, info};
 use crate::http::conn::Conn;
 use crate::middleware::Middleware;
 use crate::pool::ThreadPool;
-use crate::router::{make_dyn_handler, DynHandler, Handler, Router};
-use crate::{Request, Response};
+use crate::router::Router;
+use crate::{DynHandler, Request, Response};
 
 /// A web Application with routes and middlewares
 pub struct Application {
     addr: &'static str,
     num_threads: NonZeroUsize,
     router: Router,
-    middlewares: Vec<Arc<Middleware>>,
+    middlewares: Vec<Middleware>,
 }
 
 impl Application {
@@ -61,41 +61,30 @@ impl Application {
     /// let mut app = Application::new("0:8080");
     /// app.middleware(middleware::logging);
     /// ```
-    pub fn middleware(&mut self, middleware: Middleware) {
+    pub fn middleware<M>(&mut self, middleware: M)
+    where
+        M: Fn(DynHandler) -> DynHandler + Send + Sync + 'static,
+    {
         self.middlewares.push(Arc::new(middleware));
     }
 
-    /// Add a route using plain `fn` pointer
+    /// Add a route using a function or closure
     /// # Example
     /// ```
     /// use haro::{Application, Request, Response, middleware};
     ///
     /// let mut app = Application::new("0:8080");
-    /// app.route("/", index);
+    /// app.route("/", |_| Response::str("Hello Haro"));
+    /// app.route("/hello", hello);
     ///
-    /// fn index(_:Request) -> Response {
+    /// fn hello(_:Request) -> Response {
     ///     Response::str("Hello Haro")
     /// }
     /// ```
-    pub fn route(&mut self, pattern: &'static str, handler: Handler) {
-        self.route_dyn(pattern, make_dyn_handler(handler))
-    }
-
-    /// Add a route using closure
-    /// # Example
-    /// ```
-    /// use std::sync::Arc;
-    /// use haro::{Application, DynHandler, Response};
-    ///
-    /// let mut app = Application::new("0:8080");
-    /// app.route_dyn("/", hello("Haro"));
-    ///
-    /// fn hello(name: &str) -> DynHandler {
-    ///   let name = name.to_string();
-    ///   Arc::new(move |_| Response::str(&name))
-    /// }
-    /// ```
-    pub fn route_dyn(&mut self, pattern: &'static str, handler: DynHandler) {
+    pub fn route<F>(&mut self, pattern: &'static str, handler: F)
+    where
+        F: Fn(Request) -> Response + Send + Sync + 'static,
+    {
         self.router.add(pattern, handler);
     }
 
@@ -170,7 +159,7 @@ impl Application {
     }
 }
 
-fn handle_connection(router: Router, middlewares: Vec<Arc<Middleware>>, stream: TcpStream) {
+fn handle_connection(router: Router, middlewares: Vec<Middleware>, stream: TcpStream) {
     let mut conn = Conn::from(stream);
     let mut req = Request::from(&mut conn);
     let (params, mut handler) = router.dispatch(req.path());

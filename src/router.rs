@@ -8,9 +8,7 @@ use regex::Regex;
 use crate::http::request::Request;
 use crate::http::response::Response;
 
-/// Handler type that receive a [`Request`] and return a [`Response`]
-pub type Handler = fn(Request) -> Response;
-/// Closure type of handler in order to write a handler to capture environment variables
+/// Arc of trait object for route Handler type
 pub type DynHandler = Arc<dyn Fn(Request) -> Response + Send + Sync>;
 
 #[derive(Default, Clone)]
@@ -19,9 +17,12 @@ pub struct Router {
 }
 
 impl Router {
-    pub fn add(&mut self, pattern: &'static str, handler: DynHandler) {
+    pub fn add<F>(&mut self, pattern: &'static str, handler: F)
+    where
+        F: Fn(Request) -> Response + Send + Sync + 'static,
+    {
         let rule = Rule::from(pattern);
-        self.routes.push((rule, handler));
+        self.routes.push((rule, Arc::new(handler)));
         self.update_order()
     }
 
@@ -37,7 +38,7 @@ impl Router {
                 return (params, handler.clone());
             }
         }
-        (HashMap::new(), make_dyn_handler(not_found))
+        (HashMap::new(), Arc::new(not_found))
     }
 }
 
@@ -117,19 +118,4 @@ fn not_found(_req: Request) -> Response {
         "404 Not Found".as_bytes(),
         HashMap::new(),
     )
-}
-
-/// Change a fn pointer to a closure
-/// # Example
-/// ```
-/// use haro::{Request, Response, middleware,make_dyn_handler};
-///
-/// fn handler(_:Request) -> Response{
-///     Response::str("hello")
-/// }
-///
-/// let dyn_handler = make_dyn_handler(handler);
-/// ```
-pub fn make_dyn_handler(h: Handler) -> DynHandler {
-    Arc::new(move |req: Request| -> Response { h(req) })
 }

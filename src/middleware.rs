@@ -8,8 +8,8 @@ use log::info;
 
 use crate::{DynHandler, Request, Response};
 
-/// Function type for a middleware to receive a [`Handler`] and return a new [`Handler`]
-pub type Middleware = fn(next: DynHandler) -> DynHandler;
+/// Arc of trait object for Middleware type to receive a [`DynHandler`] and return a new [`DynHandler`]
+pub type Middleware = Arc<dyn Fn(DynHandler) -> DynHandler + Send + Sync>;
 
 /// Logging middleware to log every request and response time
 /// # Example

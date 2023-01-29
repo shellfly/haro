@@ -1,15 +1,15 @@
-/// Use `route_dyn` to register a handler with closure
-use std::sync::Arc;
-
-use haro::{Application, DynHandler, Response};
+use haro::{Application, Request, Response};
 
 fn main() {
     let mut app = Application::new("0:8080");
-    app.route_dyn("/", hello("Haro"));
+    app.route("/", |_| Response::str("Haro"));
+    app.route("/hello", hello("Haro"));
     app.run();
 }
 
-fn hello(name: &str) -> DynHandler {
+fn hello(name: &str) -> impl Fn(Request) -> Response {
     let name = name.to_string();
-    Arc::new(move |_| Response::str(&name))
+    move |_: Request| Response::str(&name)
 }
+
+

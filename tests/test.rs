@@ -1,4 +1,4 @@
-use haro::{db, middleware, Application, DynHandler, Request, Response};
+use haro::{db, middleware, Application, DynHandler, Handler, Request, Response};
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -9,14 +9,21 @@ fn test_app() {
     db::SQLite::init("test.db");
 
     let mut app = Application::new("0:8080");
+    let hello_handler = HelloHandler {
+        name: "Haro".to_string(),
+    };
     app.middleware(middleware::logging);
     app.middleware(my_middleware);
     app.route("/", index);
+    app.route_handler("/hello", hello_handler);
     app.route("/hello/:name", hello);
     app.route("/input", input);
     app.route("/sqlite", sqlite);
 
     let res = app.request("get", "/", HashMap::new(), &Vec::new());
+    assert_eq!("Hello Haro".as_bytes(), res.body());
+
+    let res = app.request("get", "/hello", HashMap::new(), &Vec::new());
     assert_eq!("Hello Haro".as_bytes(), res.body());
 
     let res = app.request("get", "/hello/world", HashMap::new(), &Vec::new());
@@ -35,6 +42,15 @@ fn test_app() {
 struct Person {
     id: i32,
     name: String,
+}
+
+struct HelloHandler {
+    name: String,
+}
+impl Handler for HelloHandler {
+    fn call(&self, _: Request) -> Response {
+        Response::str(format!("Hello {}", self.name))
+    }
 }
 
 fn index(_: Request) -> Response {

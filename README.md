@@ -30,13 +30,9 @@ use serde_json::json;
 
 fn main() {
     let mut app = Application::new("0:8000");
-    app.route("/", index);
+    app.route("/", |_|Response::str("Hello Haro"));
     app.route("/hello/:name", hello);
     app.run();
-}
-
-fn index(_: Request) -> Response {
-    Response::str("Hello Haro")
 }
 
 fn hello(req: Request) -> Response {
@@ -85,7 +81,7 @@ The repo contains [more examples](./examples) that show how to put all the piece
 
 ## Features
 
-- [x] URL Routing with plain fn pointer
+- [x] URL Routing with **function**/**closure**/**trait type**
 - [x] Request & Response with minimal boilerplate
   - [x] Query args
   - [x] Post data

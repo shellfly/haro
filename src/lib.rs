@@ -4,7 +4,7 @@
 //!
 //! ## Features
 //!
-//! - URL Routing with plain fn pointer
+//! - URL Routing with **function**/**closure**/**trait type**
 //! - Request & Response with minimal boilerplate
 //!   - Query args
 //!   - Post data
@@ -64,7 +64,7 @@ mod router;
 pub use crate::app::Application;
 pub use crate::http::request::Request;
 pub use crate::http::response::{redirect, Response};
-pub use crate::router::DynHandler;
+pub use crate::router::{DynHandler, Handler};
 
 #[cfg(feature = "template")]
 mod template;

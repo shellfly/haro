@@ -10,7 +10,7 @@ use crate::http::conn::Conn;
 use crate::middleware::Middleware;
 use crate::pool::ThreadPool;
 use crate::router::Router;
-use crate::{DynHandler, Request, Response};
+use crate::{DynHandler, Handler, Request, Response};
 
 /// A web Application with routes and middlewares
 pub struct Application {
@@ -82,11 +82,36 @@ impl Application {
     ///     Response::str("Hello Haro")
     /// }
     /// ```
-    pub fn route<F>(&mut self, pattern: &'static str, handler: F)
+    pub fn route<F>(&mut self, pattern: &'static str, f: F)
     where
         F: Fn(Request) -> Response + Send + Sync + 'static,
     {
-        self.router.add(pattern, handler);
+        self.router.add(pattern, f);
+    }
+
+    /// Add a route using a trait type
+    /// # Example
+    /// ```
+    /// use haro::{Application, Request, Response, Handler};
+    ///
+    /// let mut app = Application::new("0:8080");
+    /// let hello_handler = HelloHandler{name:"Haro".to_string()};
+    /// app.route_handler("/hello", hello_handler);
+    ///
+    /// struct HelloHandler {
+    ///     name: String,
+    /// }
+    ///
+    /// impl Handler for HelloHandler {
+    ///     fn call(&self, _: Request) -> Response {
+    ///         Response::str(format!("hello {}", self.name))
+    ///     }
+    /// }
+    pub fn route_handler<H>(&mut self, pattern: &'static str, h: H)
+    where
+        H: Handler + Send + Sync + 'static,
+    {
+        self.router.add_handler(pattern, h);
     }
 
     /// Send a request to an `Application`, usually used in test

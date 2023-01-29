@@ -11,18 +11,39 @@ use crate::http::response::Response;
 /// Arc of trait object for route Handler type
 pub type DynHandler = Arc<dyn Fn(Request) -> Response + Send + Sync>;
 
+pub trait Handler {
+    fn handler(self) -> DynHandler
+    where
+        Self: Send + Sync + Sized + 'static,
+    {
+        Arc::new(move |req: Request| -> Response { self.call(req) })
+    }
+    fn call(&self, req: Request) -> Response;
+}
+
 #[derive(Default, Clone)]
 pub struct Router {
     routes: Vec<(Rule, DynHandler)>,
 }
 
 impl Router {
-    pub fn add<F>(&mut self, pattern: &'static str, handler: F)
+    pub fn add<F>(&mut self, pattern: &'static str, f: F)
     where
         F: Fn(Request) -> Response + Send + Sync + 'static,
     {
         let rule = Rule::from(pattern);
-        self.routes.push((rule, Arc::new(handler)));
+        let handler = Arc::new(f);
+        self.routes.push((rule, handler));
+        self.update_order()
+    }
+
+    pub fn add_handler<H>(&mut self, pattern: &'static str, h: H)
+    where
+        H: Handler + Send + Sync + 'static,
+    {
+        let rule = Rule::from(pattern);
+        let handler = h.handler();
+        self.routes.push((rule, handler));
         self.update_order()
     }
 

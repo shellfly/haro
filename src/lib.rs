@@ -65,6 +65,7 @@ pub use crate::app::Application;
 pub use crate::http::request::Request;
 pub use crate::http::response::{redirect, Response};
 pub use crate::router::DynHandler;
+
 #[cfg(feature = "template")]
 mod template;
 

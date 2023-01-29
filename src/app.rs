@@ -1,8 +1,8 @@
 use std::collections::HashMap;
-use std::net::TcpStream;
+use std::net::{TcpListener, TcpStream};
 use std::num::NonZeroUsize;
 use std::sync::Arc;
-use std::{net::TcpListener, thread};
+use std::thread::available_parallelism;
 
 use log::{debug, info};
 
@@ -15,7 +15,7 @@ use crate::{DynHandler, Request, Response};
 /// A web Application with routes and middlewares
 pub struct Application {
     addr: &'static str,
-    num_threads: NonZeroUsize,
+    num_threads: usize,
     router: Router,
     middlewares: Vec<Middleware>,
 }
@@ -33,9 +33,10 @@ impl Application {
         let router = Router::default();
         let middlewares = Vec::new();
         let default_num_threads = NonZeroUsize::new(8).unwrap();
+        let num_threads = available_parallelism().unwrap_or(default_num_threads).get();
         Self {
             addr,
-            num_threads: default_num_threads,
+            num_threads,
             router,
             middlewares,
         }
@@ -49,7 +50,7 @@ impl Application {
     /// let mut app = Application::new("0:8080").num_threads(64);
     /// ```
     pub fn num_threads(mut self, n: usize) -> Self {
-        self.num_threads = NonZeroUsize::new(n).unwrap();
+        self.num_threads = n;
         self
     }
 
@@ -139,12 +140,7 @@ impl Application {
     pub fn run(&self) {
         info!("Started web server on addr {}", self.addr);
         debug!("routes: \n {:}", self.router);
-        // TODO: should pool size larger than CPU cores since many can be waiting for I/O
-        let default_pool_size = NonZeroUsize::new(8).unwrap();
-        let size = thread::available_parallelism()
-            .unwrap_or(default_pool_size)
-            .get();
-        let pool = ThreadPool::new(size);
+        let pool = ThreadPool::new(self.num_threads);
 
         let listener = TcpListener::bind(self.addr).unwrap();
         for stream in listener.incoming() {

@@ -11,5 +11,3 @@ fn hello(name: &str) -> impl Fn(Request) -> Response {
     let name = name.to_string();
     move |_: Request| Response::str(&name)
 }
-
-
